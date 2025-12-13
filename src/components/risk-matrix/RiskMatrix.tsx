@@ -59,8 +59,8 @@ export function RiskMatrix({ onCellClick, selectedCell }: RiskMatrixProps) {
         <div className="flex">
           {/* Y-axis label */}
           <div className="flex w-8 flex-col items-center justify-center text-xs text-muted-foreground">
-            <span className="rotate-180" style={{ writingMode: 'vertical-rl' }}>
-              {t('low', language)} ←── {t('probability', language)} ──→ {t('high', language)}
+            <span style={{ writingMode: 'vertical-lr' }}>
+              {t('high', language)} ←── {t('probability', language)} ──→ {t('low', language)}
             </span>
           </div>
 
