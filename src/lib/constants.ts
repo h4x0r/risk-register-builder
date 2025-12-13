@@ -29,7 +29,7 @@ export const CATEGORY_LABELS: Record<ThreatCategory, { zh: string; en: string }>
 
 export const RISK_THRESHOLDS = {
   low: { max: 15, colorClass: 'bg-green-500', textClass: 'text-green-700' },
-  medium: { max: 40, colorClass: 'bg-yellow-500', textClass: 'text-yellow-700' },
+  medium: { max: 30, colorClass: 'bg-yellow-500', textClass: 'text-yellow-700' },
   high: { max: 75, colorClass: 'bg-red-500', textClass: 'text-red-700' },
 };
 

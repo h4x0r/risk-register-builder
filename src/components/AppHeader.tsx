@@ -11,7 +11,7 @@ export function AppHeader() {
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center justify-between">
+      <div className="container flex h-14 items-center justify-between px-4">
         <h1 className="text-lg font-bold text-primary">
           {t('appTitle', language)}
         </h1>
