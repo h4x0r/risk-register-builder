@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('debug: risk matrix sync issue', async ({ page }) => {
+test('risk register shows matrix coordinates that update with ratings', async ({ page }) => {
   await page.goto('/');
 
   // Clear localStorage to start fresh
@@ -8,83 +8,73 @@ test('debug: risk matrix sync issue', async ({ page }) => {
   await page.reload();
   await page.waitForTimeout(1000);
 
-  // Take initial screenshot
-  await page.screenshot({ path: 'test-results/01-initial.png', fullPage: true });
-
-  // Switch to expert mode - look for the button by its Chinese text
+  // Switch to expert mode
   const expertButton = page.locator('button:has-text("專家模式"), button:has-text("Expert Mode")');
   await expertButton.click();
   await page.waitForTimeout(500);
 
-  await page.screenshot({ path: 'test-results/02-expert-mode.png', fullPage: true });
-
   // Add a custom threat
   const customInput = page.locator('input[placeholder*="自訂"], input[placeholder*="Custom"]');
   await customInput.fill('Test Threat');
-
-  // Click the add button next to custom input
   const addButtons = page.locator('button:has-text("+ ")');
   await addButtons.last().click();
   await page.waitForTimeout(500);
 
-  await page.screenshot({ path: 'test-results/03-threat-added.png', fullPage: true });
+  await page.screenshot({ path: 'test-results/01-threat-added.png', fullPage: true });
 
-  // Log the current entries state
-  const stateBeforeChange = await page.evaluate(() => {
-    const stored = localStorage.getItem('risk-register-storage');
-    return stored ? JSON.parse(stored) : null;
-  });
-  console.log('State after adding threat:', JSON.stringify(stateBeforeChange, null, 2));
+  // Get the Risk Register table (second table on page)
+  const riskRegisterTable = page.locator('table').nth(1);
+  const riskRegisterRow = riskRegisterTable.locator('tbody tr').first();
+  const cells = riskRegisterRow.locator('td');
 
-  // Find all rating buttons in the table row
-  const tableRow = page.locator('table tbody tr').first();
-  const allButtons = tableRow.locator('button.rounded-full');
-  const buttonCount = await allButtons.count();
-  console.log('Total buttons in row:', buttonCount);
+  // Initial values: all ratings at 3, so vulnerability=3, impact=3
+  const initialVulnerability = await cells.nth(1).textContent();
+  const initialImpact = await cells.nth(2).textContent();
+  console.log('Initial - Vulnerability:', initialVulnerability, 'Impact:', initialImpact);
+  expect(initialVulnerability?.trim()).toBe('3');
+  expect(initialImpact?.trim()).toBe('3');
 
-  // Log button texts
-  for (let i = 0; i < buttonCount; i++) {
-    const text = await allButtons.nth(i).textContent();
-    console.log(`Button ${i}: "${text}"`);
-  }
+  // Change probability to 5 (first rating group, button index 4)
+  const vulnTable = page.locator('table').first();
+  const vulnRow = vulnTable.locator('tbody tr').first();
+  const ratingButtons = vulnRow.locator('button.rounded-full');
+  await ratingButtons.nth(4).click(); // probability = 5
+  await page.waitForTimeout(300);
 
-  // Click probability button "5" (should be index 4)
-  console.log('Clicking probability 5...');
-  await allButtons.nth(4).click();
-  await page.waitForTimeout(500);
+  await page.screenshot({ path: 'test-results/02-after-prob-change.png', fullPage: true });
 
-  await page.screenshot({ path: 'test-results/04-after-prob-5.png', fullPage: true });
+  // Vulnerability should now be 5 (Y-axis = probability)
+  const afterProbVuln = await cells.nth(1).textContent();
+  console.log('After prob change - Vulnerability:', afterProbVuln);
+  expect(afterProbVuln?.trim()).toBe('5');
 
-  // Check state after clicking
-  const stateAfterProb = await page.evaluate(() => {
-    const stored = localStorage.getItem('risk-register-storage');
-    return stored ? JSON.parse(stored) : null;
-  });
-  console.log('State after prob change:', JSON.stringify(stateAfterProb, null, 2));
+  // Change life impact to 5 (second rating group, button index 9)
+  await ratingButtons.nth(9).click(); // impactLife = 5
+  await page.waitForTimeout(300);
 
-  // Click life impact button "5" (should be index 9)
-  console.log('Clicking life impact 5...');
-  await allButtons.nth(9).click();
-  await page.waitForTimeout(500);
+  await page.screenshot({ path: 'test-results/03-after-impact-change.png', fullPage: true });
 
-  await page.screenshot({ path: 'test-results/05-after-life-5.png', fullPage: true });
+  // Impact should now be 4 (X-axis = round((5+3+3)/3) = round(3.67) = 4)
+  const afterImpactValue = await cells.nth(2).textContent();
+  console.log('After impact change - Impact:', afterImpactValue);
+  expect(afterImpactValue?.trim()).toBe('4');
 
-  // Check matrix cells - look at what's in the matrix
-  const matrixContainer = page.locator('.grid.grid-cols-5');
-  const matrixHTML = await matrixContainer.innerHTML();
-  console.log('Matrix HTML (truncated):', matrixHTML.substring(0, 1000));
+  // Change all impact values to 5 to verify impact becomes 5
+  await ratingButtons.nth(14).click(); // impactAsset = 5
+  await ratingButtons.nth(19).click(); // impactBusiness = 5
+  await page.waitForTimeout(300);
 
-  // Count dots in matrix
+  await page.screenshot({ path: 'test-results/04-all-impacts-5.png', fullPage: true });
+
+  // Impact should now be 5 (X-axis = round((5+5+5)/3) = 5)
+  const finalImpact = await cells.nth(2).textContent();
+  console.log('Final - Impact:', finalImpact);
+  expect(finalImpact?.trim()).toBe('5');
+
+  // Verify matrix has dots (may have animation duplicates)
   const dotsInMatrix = page.locator('.grid-cols-5 .rounded-full.absolute');
   const dotCount = await dotsInMatrix.count();
-  console.log('Dots in matrix:', dotCount);
+  expect(dotCount).toBeGreaterThanOrEqual(1);
 
-  // Final state check
-  const finalState = await page.evaluate(() => {
-    const stored = localStorage.getItem('risk-register-storage');
-    return stored ? JSON.parse(stored) : null;
-  });
-  console.log('Final state:', JSON.stringify(finalState, null, 2));
-
-  await page.screenshot({ path: 'test-results/06-final.png', fullPage: true });
+  await page.screenshot({ path: 'test-results/05-final.png', fullPage: true });
 });

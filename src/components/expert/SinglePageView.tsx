@@ -14,7 +14,7 @@ import {
 import { useRiskRegister, createCustomEntry } from '@/hooks/useRiskRegister';
 import { RiskMatrix } from '@/components/risk-matrix/RiskMatrix';
 import { THREAT_PRESETS, CATEGORY_LABELS } from '@/lib/constants';
-import { calculateRiskLevel, getRiskLevelLabel, getRiskLevelColor } from '@/lib/calculations';
+import { calculateRiskLevel, getRiskLevelLabel, getRiskLevelColor, getMatrixPosition } from '@/lib/calculations';
 import { t } from '@/lib/i18n';
 import { ThreatCategory, ThreatEntry } from '@/types';
 import { cn } from '@/lib/utils';
@@ -278,26 +278,17 @@ export function SinglePageView() {
               <tbody>
                 {entries.map((entry) => {
                   const riskLevel = calculateRiskLevel(entry);
+                  const matrixPos = getMatrixPosition(entry);
                   return (
                     <tr key={entry.id} className="border-b">
                       <td className="p-2 font-medium">
                         {language === 'zh-TW' ? entry.name : (entry.nameEn || entry.name)}
                       </td>
-                      <td className="p-2">
-                        <Input
-                          value={entry.vulnerabilityDescription}
-                          onChange={(e) => updateEntry(entry.id, { vulnerabilityDescription: e.target.value })}
-                          className="h-8 text-sm"
-                          placeholder="-"
-                        />
+                      <td className="p-2 text-center font-medium">
+                        {matrixPos.y}
                       </td>
-                      <td className="p-2">
-                        <Input
-                          value={entry.impactDescription}
-                          onChange={(e) => updateEntry(entry.id, { impactDescription: e.target.value })}
-                          className="h-8 text-sm"
-                          placeholder="-"
-                        />
+                      <td className="p-2 text-center font-medium">
+                        {matrixPos.x}
                       </td>
                       <td className="p-2 text-center">
                         <span
