@@ -34,13 +34,13 @@ function RatingScale({ value, onChange, leftLabel, rightLabel, reversed }: Ratin
             key={v}
             onClick={() => onChange(v)}
             className={cn(
-              'h-8 w-8 rounded-full border-2 transition-all',
+              'h-12 w-12 rounded-full border-2 text-lg font-medium transition-all',
               value === v
                 ? 'border-primary bg-primary text-primary-foreground'
                 : 'border-muted hover:border-primary/50'
             )}
           >
-            {value === v && '●'}
+            {v}
           </button>
         ))}
       </div>
@@ -99,16 +99,6 @@ export function Step2ScoreThreats() {
       <Card>
         <CardContent className="pt-6">
           {/* Probability and Impact Section */}
-          <div className="mb-2 flex justify-between text-xs font-medium text-muted-foreground">
-            <span>{t('low', language)}</span>
-            <span>{t('high', language)}</span>
-          </div>
-          <div className="flex justify-center gap-4 text-sm text-muted-foreground mb-4">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <div key={n} className="w-8 text-center">○</div>
-            ))}
-          </div>
-
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               <Label className="w-24 shrink-0">{t('probability', language)}</Label>
@@ -169,16 +159,6 @@ export function Step2ScoreThreats() {
       <Card>
         <CardContent className="pt-6">
           {/* Controls Section - Reversed */}
-          <div className="mb-2 flex justify-between text-xs font-medium text-muted-foreground">
-            <span>{t('weak', language)}</span>
-            <span>{t('strong', language)}</span>
-          </div>
-          <div className="flex justify-center gap-4 text-sm text-muted-foreground mb-4">
-            {[5, 4, 3, 2, 1].map((n) => (
-              <div key={n} className="w-8 text-center">○</div>
-            ))}
-          </div>
-
           <p className="text-sm font-medium text-muted-foreground mb-4">
             {t('controlCapability', language)}
           </p>
