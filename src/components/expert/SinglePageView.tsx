@@ -133,9 +133,9 @@ export function SinglePageView() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-4">
         {/* Vulnerability Analysis Table */}
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-3">
           <CardHeader className="py-3">
             <CardTitle className="text-base">{t('vulnerabilityAnalysis', language)}</CardTitle>
           </CardHeader>

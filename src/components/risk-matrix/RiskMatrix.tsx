@@ -75,7 +75,7 @@ export function RiskMatrix({ onCellClick, selectedCell }: RiskMatrixProps) {
                   <TooltipTrigger asChild>
                     <button
                       className={cn(
-                        'relative h-12 w-12 rounded transition-all',
+                        'relative h-8 w-8 rounded transition-all',
                         CELL_COLORS[cell.level],
                         isSelected && 'ring-2 ring-primary ring-offset-2',
                         onCellClick && 'cursor-pointer'
@@ -91,7 +91,7 @@ export function RiskMatrix({ onCellClick, selectedCell }: RiskMatrixProps) {
                             exit={{ scale: 0, opacity: 0 }}
                             transition={{ delay: index * 0.1 }}
                             className={cn(
-                              'absolute h-4 w-4 rounded-full border-2 border-white shadow-sm',
+                              'absolute h-3 w-3 rounded-full border border-white shadow-sm',
                               MARKER_COLORS[cell.level]
                             )}
                             style={{
