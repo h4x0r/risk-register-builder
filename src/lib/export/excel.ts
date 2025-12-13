@@ -2,7 +2,7 @@
 
 import ExcelJS from 'exceljs';
 import { ThreatEntry, Language } from '@/types';
-import { calculateRiskLevel, getRiskLevelLabel } from '@/lib/calculations';
+import { calculateRiskLevel, getRiskLevelLabel, getMatrixPosition } from '@/lib/calculations';
 
 export async function exportToExcel(entries: ThreatEntry[], language: Language): Promise<void> {
   const workbook = new ExcelJS.Workbook();
@@ -76,10 +76,11 @@ export async function exportToExcel(entries: ThreatEntry[], language: Language):
   // Add data rows
   entries.forEach((entry) => {
     const riskLevel = calculateRiskLevel(entry);
+    const matrixPos = getMatrixPosition(entry);
     sheet2.addRow([
       language === 'zh-TW' ? entry.name : (entry.nameEn || entry.name),
-      entry.vulnerabilityDescription || '-',
-      entry.impactDescription || '-',
+      matrixPos.y, // Vulnerability = probability (Y-axis)
+      matrixPos.x, // Impact = avg impact (X-axis)
       getRiskLevelLabel(riskLevel, language),
       entry.mitigationStrategy || '-',
     ]);
@@ -88,8 +89,8 @@ export async function exportToExcel(entries: ThreatEntry[], language: Language):
   // Set column widths
   sheet2.columns = [
     { width: 20 },
-    { width: 30 },
-    { width: 25 },
+    { width: 12 },
+    { width: 12 },
     { width: 12 },
     { width: 40 },
   ];

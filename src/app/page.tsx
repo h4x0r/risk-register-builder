@@ -1,13 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRiskRegister } from '@/hooks/useRiskRegister';
 import { AppHeader } from '@/components/AppHeader';
-import { WizardView } from '@/components/WizardView';
 import { SinglePageView } from '@/components/expert/SinglePageView';
 
 export default function Home() {
-  const { viewMode } = useRiskRegister();
   const [mounted, setMounted] = useState(false);
 
   // Prevent hydration mismatch
@@ -27,7 +24,7 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       <AppHeader />
       <main className="container py-6">
-        {viewMode === 'wizard' ? <WizardView /> : <SinglePageView />}
+        <SinglePageView />
       </main>
     </div>
   );

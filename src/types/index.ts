@@ -4,8 +4,6 @@ export type RiskLevel = 'low' | 'medium' | 'high';
 
 export type Language = 'zh-TW' | 'en';
 
-export type ViewMode = 'wizard' | 'expert';
-
 export interface ThreatEntry {
   id: string;
   name: string;
@@ -21,8 +19,6 @@ export interface ThreatEntry {
   controlExternal: number;       // 外部資源: 1=強, 5=弱
 
   // Risk register fields
-  vulnerabilityDescription: string;  // 脆弱性
-  impactDescription: string;         // 影響
   mitigationStrategy: string;        // 緩解策略
 }
 
@@ -35,22 +31,14 @@ export interface ThreatPreset {
 
 export interface RiskRegisterState {
   entries: ThreatEntry[];
-  viewMode: ViewMode;
   language: Language;
-  currentStep: number;
-  selectedPresets: string[];
 }
 
 export interface RiskRegisterActions {
   addEntry: (entry: ThreatEntry) => void;
   updateEntry: (id: string, updates: Partial<ThreatEntry>) => void;
   removeEntry: (id: string) => void;
-  setViewMode: (mode: ViewMode) => void;
   setLanguage: (lang: Language) => void;
-  setStep: (step: number) => void;
-  togglePreset: (presetId: string) => void;
-  clearSelectedPresets: () => void;
-  createEntriesFromPresets: () => void;
   reset: () => void;
 }
 

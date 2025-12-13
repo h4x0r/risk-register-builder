@@ -33,13 +33,6 @@ export const RISK_THRESHOLDS = {
   high: { max: 75, colorClass: 'bg-red-500', textClass: 'text-red-700' },
 };
 
-export const WIZARD_STEPS = [
-  { step: 1, labelZh: '新增威脅', labelEn: 'Add Threats' },
-  { step: 2, labelZh: '評分', labelEn: 'Score Threats' },
-  { step: 3, labelZh: '檢視', labelEn: 'Review' },
-  { step: 4, labelZh: '匯出', labelEn: 'Export' },
-];
-
 export const DEFAULT_ENTRY_VALUES = {
   probability: 3,
   impactLife: 3,
@@ -47,7 +40,5 @@ export const DEFAULT_ENTRY_VALUES = {
   impactBusiness: 3,
   controlInternal: 3,
   controlExternal: 3,
-  vulnerabilityDescription: '',
-  impactDescription: '',
   mitigationStrategy: '',
 };

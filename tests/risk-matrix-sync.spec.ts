@@ -8,11 +8,6 @@ test('risk register shows matrix coordinates that update with ratings', async ({
   await page.reload();
   await page.waitForTimeout(1000);
 
-  // Switch to expert mode
-  const expertButton = page.locator('button:has-text("專家模式"), button:has-text("Expert Mode")');
-  await expertButton.click();
-  await page.waitForTimeout(500);
-
   // Add a custom threat
   const customInput = page.locator('input[placeholder*="自訂"], input[placeholder*="Custom"]');
   await customInput.fill('Test Threat');

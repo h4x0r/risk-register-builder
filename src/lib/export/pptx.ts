@@ -2,7 +2,7 @@
 
 import PptxGenJS from 'pptxgenjs';
 import { ThreatEntry, Language } from '@/types';
-import { calculateRiskLevel, getRiskLevelLabel } from '@/lib/calculations';
+import { calculateRiskLevel, getRiskLevelLabel, getMatrixPosition } from '@/lib/calculations';
 
 export async function exportToPptx(entries: ThreatEntry[], language: Language): Promise<void> {
   const pptx = new PptxGenJS();
@@ -110,10 +110,11 @@ export async function exportToPptx(entries: ThreatEntry[], language: Language): 
 
   const dataRows3: PptxGenJS.TableRow[] = entries.map((entry) => {
     const riskLevel = calculateRiskLevel(entry);
+    const matrixPos = getMatrixPosition(entry);
     return [
       { text: language === 'zh-TW' ? entry.name : (entry.nameEn || entry.name), options: { bold: true } },
-      { text: entry.vulnerabilityDescription || '-' },
-      { text: entry.impactDescription || '-' },
+      { text: String(matrixPos.y), options: { align: 'center' as const } },
+      { text: String(matrixPos.x), options: { align: 'center' as const } },
       {
         text: getRiskLevelLabel(riskLevel, language),
         options: {

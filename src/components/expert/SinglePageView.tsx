@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/select';
 import { useRiskRegister, createCustomEntry } from '@/hooks/useRiskRegister';
 import { RiskMatrix } from '@/components/risk-matrix/RiskMatrix';
-import { THREAT_PRESETS, CATEGORY_LABELS } from '@/lib/constants';
+import { THREAT_PRESETS, CATEGORY_LABELS, DEFAULT_ENTRY_VALUES } from '@/lib/constants';
 import { calculateRiskLevel, getRiskLevelLabel, getRiskLevelColor, getMatrixPosition } from '@/lib/calculations';
 import { t } from '@/lib/i18n';
 import { ThreatCategory, ThreatEntry } from '@/types';
@@ -60,15 +60,7 @@ export function SinglePageView() {
       name: preset.nameZh,
       nameEn: preset.nameEn,
       category: preset.category,
-      probability: 3,
-      impactLife: 3,
-      impactAsset: 3,
-      impactBusiness: 3,
-      controlInternal: 3,
-      controlExternal: 3,
-      vulnerabilityDescription: '',
-      impactDescription: '',
-      mitigationStrategy: '',
+      ...DEFAULT_ENTRY_VALUES,
     });
     setSelectedPreset('');
   };

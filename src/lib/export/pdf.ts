@@ -1,7 +1,7 @@
 'use client';
 
 import { ThreatEntry, Language, RiskLevel } from '@/types';
-import { calculateRiskLevel, getRiskLevelLabel } from '@/lib/calculations';
+import { calculateRiskLevel, getRiskLevelLabel, getMatrixPosition } from '@/lib/calculations';
 
 // Simple PDF generation using browser print
 export async function exportToPdf(entries: ThreatEntry[], language: Language): Promise<void> {
@@ -71,11 +71,12 @@ export async function exportToPdf(entries: ThreatEntry[], language: Language): P
         <tbody>
           ${entries.map((entry) => {
             const riskLevel = calculateRiskLevel(entry);
+            const matrixPos = getMatrixPosition(entry);
             return `
               <tr>
                 <td><strong>${language === 'zh-TW' ? entry.name : (entry.nameEn || entry.name)}</strong></td>
-                <td>${entry.vulnerabilityDescription || '-'}</td>
-                <td>${entry.impactDescription || '-'}</td>
+                <td style="text-align: center;">${matrixPos.y}</td>
+                <td style="text-align: center;">${matrixPos.x}</td>
                 <td><span class="risk-${riskLevel}">${getRiskLevelLabel(riskLevel, language)}</span></td>
                 <td>${entry.mitigationStrategy || '-'}</td>
               </tr>

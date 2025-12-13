@@ -78,8 +78,6 @@ export function getCellRiskLevel(x: number, y: number): RiskLevel {
     impactBusiness: x,
     controlInternal: 3,
     controlExternal: 3,
-    vulnerabilityDescription: '',
-    impactDescription: '',
     mitigationStrategy: '',
   };
   return calculateRiskLevel(mockEntry);
