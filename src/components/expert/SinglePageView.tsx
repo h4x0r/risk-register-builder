@@ -22,16 +22,20 @@ import { cn } from '@/lib/utils';
 function CompactRating({ value, onChange, reversed }: { value: number; onChange: (v: number) => void; reversed?: boolean }) {
   const values = reversed ? [5, 4, 3, 2, 1] : [1, 2, 3, 4, 5];
   return (
-    <div className="flex gap-0.5">
+    <div className="flex gap-1">
       {values.map((v) => (
         <button
           key={v}
           onClick={() => onChange(v)}
           className={cn(
-            'h-3 w-3 rounded-full transition-all',
-            value === v ? 'bg-primary' : 'bg-muted hover:bg-muted-foreground/30'
+            'h-8 w-8 rounded-full text-sm font-medium transition-all active:scale-95',
+            value === v
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-muted hover:bg-muted-foreground/30'
           )}
-        />
+        >
+          {v}
+        </button>
       ))}
     </div>
   );
