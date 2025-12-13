@@ -16,6 +16,7 @@ import {
 interface RiskMatrixProps {
   onCellClick?: (x: number, y: number) => void;
   selectedCell?: { x: number; y: number } | null;
+  entries?: ThreatEntry[];
 }
 
 const CELL_COLORS: Record<RiskLevel, string> = {
@@ -30,8 +31,9 @@ const MARKER_COLORS: Record<RiskLevel, string> = {
   high: 'bg-red-600',
 };
 
-export function RiskMatrix({ onCellClick, selectedCell }: RiskMatrixProps) {
-  const { entries, language } = useRiskRegister();
+export function RiskMatrix({ onCellClick, selectedCell, entries: propEntries }: RiskMatrixProps) {
+  const { entries: storeEntries, language } = useRiskRegister();
+  const entries = propEntries ?? storeEntries;
 
   // Create 5x5 grid (x: impact 1-5, y: probability 1-5)
   const grid = [];

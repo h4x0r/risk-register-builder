@@ -253,7 +253,7 @@ export function SinglePageView() {
             <CardTitle className="text-base">{t('riskMatrix', language)}</CardTitle>
           </CardHeader>
           <CardContent className="flex justify-center py-2">
-            <RiskMatrix key={entries.map(e => `${e.id}-${e.probability}-${e.impactLife}-${e.impactAsset}-${e.impactBusiness}`).join(',')} />
+            <RiskMatrix entries={entries} />
           </CardContent>
         </Card>
       </div>
