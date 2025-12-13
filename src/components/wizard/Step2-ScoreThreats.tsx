@@ -34,7 +34,7 @@ function RatingScale({ value, onChange, leftLabel, rightLabel, reversed }: Ratin
             key={v}
             onClick={() => onChange(v)}
             className={cn(
-              'h-20 w-20 rounded-full border-3 text-2xl font-bold transition-all active:scale-95',
+              'h-6 w-6 rounded-full text-xs font-medium transition-all active:scale-95',
               value === v
                 ? 'border-primary bg-primary text-primary-foreground'
                 : 'border-muted hover:border-primary/50'

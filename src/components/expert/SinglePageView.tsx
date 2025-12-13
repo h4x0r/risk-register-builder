@@ -28,7 +28,7 @@ function CompactRating({ value, onChange, reversed }: { value: number; onChange:
           key={v}
           onClick={() => onChange(v)}
           className={cn(
-            'h-8 w-8 rounded-full text-sm font-medium transition-all active:scale-95',
+            'h-6 w-6 rounded-full text-xs font-medium transition-all active:scale-95',
             value === v
               ? 'bg-primary text-primary-foreground'
               : 'bg-muted hover:bg-muted-foreground/30'
