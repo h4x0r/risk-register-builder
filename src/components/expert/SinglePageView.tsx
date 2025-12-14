@@ -137,25 +137,25 @@ export function SinglePageView() {
                 <thead>
                   {/* Row 1: Main headers */}
                   <tr className="border-b">
-                    <th className="p-2 text-left font-medium" rowSpan={3}>{t('threat', language)}</th>
-                    <th className="p-2 text-center font-medium">{t('probability', language)}</th>
-                    <th className="p-2 text-center font-medium" colSpan={3}>{t('impact', language)}</th>
-                    <th className="p-2 text-center font-medium" colSpan={2}>{t('controlCapability', language)}</th>
+                    <th className="p-2 text-left font-medium border-r" rowSpan={3}>{t('threat', language)}</th>
+                    <th className="p-2 text-center font-medium border-r">{t('probability', language)}</th>
+                    <th className="p-2 text-center font-medium border-r" colSpan={3}>{t('impact', language)}</th>
+                    <th className="p-2 text-center font-medium border-r" colSpan={2}>{t('controlCapability', language)}</th>
                     <th className="p-2 text-center font-medium" rowSpan={3}>{t('riskLevel', language)}</th>
                     <th className="p-2" rowSpan={3}></th>
                   </tr>
                   {/* Row 2: Sub-headers */}
                   <tr className="border-b text-xs text-muted-foreground">
-                    <th className="p-1"></th>
+                    <th className="p-1 border-r"></th>
                     <th className="p-1">{language === 'zh-TW' ? '生命' : 'Life'}</th>
                     <th className="p-1">{language === 'zh-TW' ? '財產' : 'Asset'}</th>
-                    <th className="p-1">{language === 'zh-TW' ? '業務' : 'Biz'}</th>
+                    <th className="p-1 border-r">{language === 'zh-TW' ? '業務' : 'Biz'}</th>
                     <th className="p-1">{language === 'zh-TW' ? '內部' : 'Int'}</th>
-                    <th className="p-1">{language === 'zh-TW' ? '外部' : 'Ext'}</th>
+                    <th className="p-1 border-r">{language === 'zh-TW' ? '外部' : 'Ext'}</th>
                   </tr>
                   {/* Row 3: Scale indicators */}
                   <tr className="border-b text-xs text-muted-foreground">
-                    <th className="p-1">
+                    <th className="p-1 border-r">
                       <div className="flex justify-between">
                         <span>{t('low', language)}</span>
                         <span>←→</span>
@@ -176,7 +176,7 @@ export function SinglePageView() {
                         <span>{t('high', language)}</span>
                       </div>
                     </th>
-                    <th className="p-1">
+                    <th className="p-1 border-r">
                       <div className="flex justify-between">
                         <span>{t('low', language)}</span>
                         <span>→</span>
@@ -190,7 +190,7 @@ export function SinglePageView() {
                         <span>{t('strong', language)}</span>
                       </div>
                     </th>
-                    <th className="p-1">
+                    <th className="p-1 border-r">
                       <div className="flex justify-between">
                         <span>{t('weak', language)}</span>
                         <span>→</span>
@@ -204,10 +204,10 @@ export function SinglePageView() {
                     const riskLevel = calculateRiskLevel(entry);
                     return (
                       <tr key={entry.id} className="border-b">
-                        <td className="p-2 font-medium">
+                        <td className="p-2 font-medium border-r">
                           {language === 'zh-TW' ? entry.name : (entry.nameEn || entry.name)}
                         </td>
-                        <td className="p-2">
+                        <td className="p-2 border-r">
                           <CompactRating
                             value={entry.probability}
                             onChange={(v) => updateEntry(entry.id, { probability: v })}
@@ -225,7 +225,7 @@ export function SinglePageView() {
                             onChange={(v) => updateEntry(entry.id, { impactAsset: v })}
                           />
                         </td>
-                        <td className="p-2">
+                        <td className="p-2 border-r">
                           <CompactRating
                             value={entry.impactBusiness}
                             onChange={(v) => updateEntry(entry.id, { impactBusiness: v })}
@@ -238,7 +238,7 @@ export function SinglePageView() {
                             reversed
                           />
                         </td>
-                        <td className="p-2">
+                        <td className="p-2 border-r">
                           <CompactRating
                             value={entry.controlExternal}
                             onChange={(v) => updateEntry(entry.id, { controlExternal: v })}
