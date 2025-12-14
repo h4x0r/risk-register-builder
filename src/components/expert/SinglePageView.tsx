@@ -219,10 +219,10 @@ export function SinglePageView() {
 
         {/* Risk Matrix (Center) */}
         <Card className="lg:col-span-3">
-          <CardHeader className="py-3">
+          <CardHeader className="py-3 px-3">
             <CardTitle className="text-base">{t('riskMatrix', language)}</CardTitle>
           </CardHeader>
-          <CardContent className="flex justify-center py-2">
+          <CardContent className="px-2 py-2">
             <RiskMatrix entries={entries} />
           </CardContent>
         </Card>
