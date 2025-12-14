@@ -126,11 +126,11 @@ export function SinglePageView() {
       </Card>
 
       <div className="grid gap-4 lg:grid-cols-12">
-        {/* Position Inputs: Threat, Probability, Impact */}
-        <Card className="lg:col-span-5">
+        {/* Inherent Risk: Threat, Probability, Impact */}
+        <Card className="lg:col-span-6">
           <CardHeader className="py-3">
             <CardTitle className="text-base">
-              {language === 'zh-TW' ? '風險定位' : 'Risk Position'}
+              {language === 'zh-TW' ? '固有風險' : 'Inherent Risk'}
             </CardTitle>
           </CardHeader>
           <CardContent className="py-2">
@@ -227,11 +227,11 @@ export function SinglePageView() {
           </CardContent>
         </Card>
 
-        {/* Risk Adjustment: Control, Risk Level */}
-        <Card className="lg:col-span-4">
+        {/* Residual Risk: Control, Risk Level */}
+        <Card className="lg:col-span-3">
           <CardHeader className="py-3">
             <CardTitle className="text-base">
-              {language === 'zh-TW' ? '風險調整' : 'Risk Adjustment'}
+              {language === 'zh-TW' ? '剩餘風險' : 'Residual Risk'}
             </CardTitle>
           </CardHeader>
           <CardContent className="py-2">
