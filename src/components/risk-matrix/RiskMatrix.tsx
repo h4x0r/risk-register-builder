@@ -49,20 +49,22 @@ export function RiskMatrix({ onCellClick, selectedCell, entries: propEntries }: 
 
   return (
     <TooltipProvider>
-      <div className="space-y-2">
-        {/* Header */}
-        <div className="flex items-end justify-center gap-1 text-xs text-muted-foreground">
-          <span className="w-8" />
-          <span className="flex-1 text-center">
-            {t('low', language)} ←── {t('impact', language)} ──→ {t('high', language)}
-          </span>
+      <div className="inline-block">
+        {/* Header - Impact label */}
+        <div className="flex text-xs text-muted-foreground mb-1">
+          <div className="w-6" />
+          <div className="flex justify-between" style={{ width: '180px' }}>
+            <span>{t('low', language)}</span>
+            <span>{t('impact', language)}</span>
+            <span>{t('high', language)}</span>
+          </div>
         </div>
 
         <div className="flex">
           {/* Y-axis label */}
-          <div className="flex w-8 flex-col items-center justify-center text-xs text-muted-foreground">
-            <span style={{ writingMode: 'vertical-lr' }}>
-              {t('high', language)} ←── {t('probability', language)} ──→ {t('low', language)}
+          <div className="flex w-6 flex-col items-center justify-center text-xs text-muted-foreground">
+            <span style={{ writingMode: 'vertical-lr', transform: 'rotate(180deg)' }}>
+              {t('low', language)} ← {t('probability', language)} → {t('high', language)}
             </span>
           </div>
 
