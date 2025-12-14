@@ -39,6 +39,7 @@ export interface RiskRegisterActions {
   updateEntry: (id: string, updates: Partial<ThreatEntry>) => void;
   removeEntry: (id: string) => void;
   setLanguage: (lang: Language) => void;
+  hydrateEntries: (entries: ThreatEntry[]) => void;
   reset: () => void;
 }
 

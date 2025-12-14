@@ -15,6 +15,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "風險登記冊建置工具 | Risk Register Builder",
   description: "A web-based tool for building risk registers based on TVRA methodology",
+  icons: {
+    icon: "/hkios-logo.png",
+    apple: "/hkios-logo.png",
+  },
 };
 
 export default function RootLayout({

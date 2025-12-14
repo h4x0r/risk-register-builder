@@ -5,13 +5,14 @@ import { persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
 import { RiskRegisterStore, ThreatEntry } from '@/types';
 import { DEFAULT_ENTRY_VALUES } from '@/lib/constants';
+import { detectSystemLanguage } from '@/lib/detect-language';
 
 export const useRiskRegister = create<RiskRegisterStore>()(
   persist(
     (set) => ({
       // State
       entries: [],
-      language: 'zh-TW',
+      language: detectSystemLanguage(),
 
       // Actions
       addEntry: (entry: ThreatEntry) => {
@@ -36,6 +37,10 @@ export const useRiskRegister = create<RiskRegisterStore>()(
 
       setLanguage: (lang) => {
         set({ language: lang });
+      },
+
+      hydrateEntries: (entries) => {
+        set({ entries });
       },
 
       reset: () => {
