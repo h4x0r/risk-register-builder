@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRiskRegister } from '@/hooks/useRiskRegister';
-import { getMatrixPosition, getCellRiskLevel, getEntriesAtCell } from '@/lib/calculations';
+import { getMatrixPosition, getCellRiskLevel, getEntriesAtCell, calculateRiskLevel } from '@/lib/calculations';
 import { t } from '@/lib/i18n';
 import { ThreatEntry, RiskLevel } from '@/types';
 import { cn } from '@/lib/utils';
@@ -85,7 +85,9 @@ export function RiskMatrix({ onCellClick, selectedCell, entries: propEntries }: 
                       onClick={() => onCellClick?.(cell.x, cell.y)}
                     >
                       <AnimatePresence>
-                        {cell.entries.map((entry, index) => (
+                        {cell.entries.map((entry, index) => {
+                          const entryRiskLevel = calculateRiskLevel(entry);
+                          return (
                           <motion.div
                             key={entry.id}
                             initial={{ scale: 0, opacity: 0 }}
@@ -94,14 +96,15 @@ export function RiskMatrix({ onCellClick, selectedCell, entries: propEntries }: 
                             transition={{ delay: index * 0.1 }}
                             className={cn(
                               'absolute h-3 w-3 rounded-full border border-white shadow-sm',
-                              MARKER_COLORS[cell.level]
+                              MARKER_COLORS[entryRiskLevel]
                             )}
                             style={{
                               top: `${20 + (index % 3) * 12}%`,
                               left: `${20 + Math.floor(index / 3) * 25}%`,
                             }}
                           />
-                        ))}
+                        );
+                        })}
                       </AnimatePresence>
                       {cell.entries.length > 3 && (
                         <span className="absolute bottom-0 right-0 rounded-tl bg-black/50 px-1 text-xs text-white">
