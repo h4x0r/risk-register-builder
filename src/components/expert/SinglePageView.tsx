@@ -183,10 +183,17 @@ export function SinglePageView() {
                         <span>{t('high', language)}</span>
                       </div>
                     </th>
-                    <th className="p-1" colSpan={2}>
+                    <th className="p-1">
                       <div className="flex justify-between">
                         <span>{t('weak', language)}</span>
-                        <span>←→</span>
+                        <span>→</span>
+                        <span>{t('strong', language)}</span>
+                      </div>
+                    </th>
+                    <th className="p-1">
+                      <div className="flex justify-between">
+                        <span>{t('weak', language)}</span>
+                        <span>→</span>
                         <span>{t('strong', language)}</span>
                       </div>
                     </th>
