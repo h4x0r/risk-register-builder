@@ -144,7 +144,16 @@ export function SinglePageView() {
                     <th className="p-2 text-center font-medium" rowSpan={3}>{t('riskLevel', language)}</th>
                     <th className="p-2" rowSpan={3}></th>
                   </tr>
-                  {/* Row 2: Scale indicators */}
+                  {/* Row 2: Sub-headers */}
+                  <tr className="border-b text-xs text-muted-foreground">
+                    <th className="p-1"></th>
+                    <th className="p-1">{language === 'zh-TW' ? '生命' : 'Life'}</th>
+                    <th className="p-1">{language === 'zh-TW' ? '財產' : 'Asset'}</th>
+                    <th className="p-1">{language === 'zh-TW' ? '業務' : 'Biz'}</th>
+                    <th className="p-1">{language === 'zh-TW' ? '內部' : 'Int'}</th>
+                    <th className="p-1">{language === 'zh-TW' ? '外部' : 'Ext'}</th>
+                  </tr>
+                  {/* Row 3: Scale indicators */}
                   <tr className="border-b text-xs text-muted-foreground">
                     <th className="p-1">
                       <div className="flex justify-between">
@@ -181,15 +190,6 @@ export function SinglePageView() {
                         <span>{t('strong', language)}</span>
                       </div>
                     </th>
-                  </tr>
-                  {/* Row 3: Sub-headers */}
-                  <tr className="border-b text-xs text-muted-foreground">
-                    <th className="p-1"></th>
-                    <th className="p-1">{language === 'zh-TW' ? '生命' : 'Life'}</th>
-                    <th className="p-1">{language === 'zh-TW' ? '財產' : 'Asset'}</th>
-                    <th className="p-1">{language === 'zh-TW' ? '業務' : 'Biz'}</th>
-                    <th className="p-1">{language === 'zh-TW' ? '內部' : 'Int'}</th>
-                    <th className="p-1">{language === 'zh-TW' ? '外部' : 'Ext'}</th>
                   </tr>
                 </thead>
                 <tbody>
