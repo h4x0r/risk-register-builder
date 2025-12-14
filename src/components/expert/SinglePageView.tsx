@@ -125,35 +125,29 @@ export function SinglePageView() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 lg:grid-cols-4">
-        {/* Vulnerability Analysis Table */}
-        <Card className="lg:col-span-3">
+      <div className="grid gap-4 lg:grid-cols-12">
+        {/* Position Inputs: Threat, Probability, Impact */}
+        <Card className="lg:col-span-5">
           <CardHeader className="py-3">
-            <CardTitle className="text-base">{t('vulnerabilityAnalysis', language)}</CardTitle>
+            <CardTitle className="text-base">
+              {language === 'zh-TW' ? '風險定位' : 'Risk Position'}
+            </CardTitle>
           </CardHeader>
           <CardContent className="py-2">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  {/* Row 1: Main headers */}
                   <tr className="border-b">
                     <th className="p-2 text-left font-medium border-r" rowSpan={3}>{t('threat', language)}</th>
                     <th className="p-2 text-center font-medium border-r">{t('probability', language)}</th>
-                    <th className="p-2 text-center font-medium border-r" colSpan={3}>{t('impact', language)}</th>
-                    <th className="p-2 text-center font-medium border-r" colSpan={2}>{t('controlCapability', language)}</th>
-                    <th className="p-2 text-center font-medium" rowSpan={3}>{t('riskLevel', language)}</th>
-                    <th className="p-2" rowSpan={3}></th>
+                    <th className="p-2 text-center font-medium" colSpan={3}>{t('impact', language)}</th>
                   </tr>
-                  {/* Row 2: Sub-headers */}
                   <tr className="border-b text-xs text-muted-foreground">
                     <th className="p-1 border-r"></th>
                     <th className="p-1">{language === 'zh-TW' ? '生命' : 'Life'}</th>
                     <th className="p-1">{language === 'zh-TW' ? '財產' : 'Asset'}</th>
-                    <th className="p-1 border-r">{language === 'zh-TW' ? '業務' : 'Biz'}</th>
-                    <th className="p-1">{language === 'zh-TW' ? '內部' : 'Int'}</th>
-                    <th className="p-1 border-r">{language === 'zh-TW' ? '外部' : 'Ext'}</th>
+                    <th className="p-1">{language === 'zh-TW' ? '業務' : 'Biz'}</th>
                   </tr>
-                  {/* Row 3: Scale indicators */}
                   <tr className="border-b text-xs text-muted-foreground">
                     <th className="p-1 border-r">
                       <div className="flex justify-between">
@@ -176,13 +170,84 @@ export function SinglePageView() {
                         <span>{t('high', language)}</span>
                       </div>
                     </th>
-                    <th className="p-1 border-r">
+                    <th className="p-1">
                       <div className="flex justify-between">
                         <span>{t('low', language)}</span>
                         <span>→</span>
                         <span>{t('high', language)}</span>
                       </div>
                     </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {entries.map((entry) => (
+                    <tr key={entry.id} className="border-b">
+                      <td className="p-2 font-medium border-r">
+                        {language === 'zh-TW' ? entry.name : (entry.nameEn || entry.name)}
+                      </td>
+                      <td className="p-2 border-r">
+                        <CompactRating
+                          value={entry.probability}
+                          onChange={(v) => updateEntry(entry.id, { probability: v })}
+                        />
+                      </td>
+                      <td className="p-2">
+                        <CompactRating
+                          value={entry.impactLife}
+                          onChange={(v) => updateEntry(entry.id, { impactLife: v })}
+                        />
+                      </td>
+                      <td className="p-2">
+                        <CompactRating
+                          value={entry.impactAsset}
+                          onChange={(v) => updateEntry(entry.id, { impactAsset: v })}
+                        />
+                      </td>
+                      <td className="p-2">
+                        <CompactRating
+                          value={entry.impactBusiness}
+                          onChange={(v) => updateEntry(entry.id, { impactBusiness: v })}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Risk Matrix (Center) */}
+        <Card className="lg:col-span-3">
+          <CardHeader className="py-3">
+            <CardTitle className="text-base">{t('riskMatrix', language)}</CardTitle>
+          </CardHeader>
+          <CardContent className="flex justify-center py-2">
+            <RiskMatrix entries={entries} />
+          </CardContent>
+        </Card>
+
+        {/* Risk Adjustment: Control, Risk Level */}
+        <Card className="lg:col-span-4">
+          <CardHeader className="py-3">
+            <CardTitle className="text-base">
+              {language === 'zh-TW' ? '風險調整' : 'Risk Adjustment'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="py-2">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="p-2 text-center font-medium border-r" colSpan={2}>{t('controlCapability', language)}</th>
+                    <th className="p-2 text-center font-medium" rowSpan={3}>{t('riskLevel', language)}</th>
+                    <th className="p-2" rowSpan={3}></th>
+                  </tr>
+                  <tr className="border-b text-xs text-muted-foreground">
+                    <th className="p-1">{language === 'zh-TW' ? '內部' : 'Int'}</th>
+                    <th className="p-1 border-r">{language === 'zh-TW' ? '外部' : 'Ext'}</th>
+                  </tr>
+                  <tr className="border-b text-xs text-muted-foreground">
                     <th className="p-1">
                       <div className="flex justify-between">
                         <span>{t('weak', language)}</span>
@@ -204,33 +269,6 @@ export function SinglePageView() {
                     const riskLevel = calculateRiskLevel(entry);
                     return (
                       <tr key={entry.id} className="border-b">
-                        <td className="p-2 font-medium border-r">
-                          {language === 'zh-TW' ? entry.name : (entry.nameEn || entry.name)}
-                        </td>
-                        <td className="p-2 border-r">
-                          <CompactRating
-                            value={entry.probability}
-                            onChange={(v) => updateEntry(entry.id, { probability: v })}
-                          />
-                        </td>
-                        <td className="p-2">
-                          <CompactRating
-                            value={entry.impactLife}
-                            onChange={(v) => updateEntry(entry.id, { impactLife: v })}
-                          />
-                        </td>
-                        <td className="p-2">
-                          <CompactRating
-                            value={entry.impactAsset}
-                            onChange={(v) => updateEntry(entry.id, { impactAsset: v })}
-                          />
-                        </td>
-                        <td className="p-2 border-r">
-                          <CompactRating
-                            value={entry.impactBusiness}
-                            onChange={(v) => updateEntry(entry.id, { impactBusiness: v })}
-                          />
-                        </td>
                         <td className="p-2">
                           <CompactRating
                             value={entry.controlInternal}
@@ -271,16 +309,6 @@ export function SinglePageView() {
                 </tbody>
               </table>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Risk Matrix */}
-        <Card>
-          <CardHeader className="py-3">
-            <CardTitle className="text-base">{t('riskMatrix', language)}</CardTitle>
-          </CardHeader>
-          <CardContent className="flex justify-center py-2">
-            <RiskMatrix entries={entries} />
           </CardContent>
         </Card>
       </div>
