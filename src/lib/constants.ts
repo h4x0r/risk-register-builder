@@ -2,10 +2,8 @@ import { ThreatCategory, ThreatPreset } from '@/types';
 
 export const THREAT_PRESETS: ThreatPreset[] = [
   // 自然災害 (Natural Disasters)
-  { id: 'typhoon', nameZh: '超強颱風', nameEn: 'Super Typhoon', category: 'natural' },
-  { id: 'storm-surge', nameZh: '風暴潮', nameEn: 'Storm Surge', category: 'natural' },
-  { id: 'heavy-rain', nameZh: '暴雨 (黑/紅)', nameEn: 'Heavy Rain (Black/Red)', category: 'natural' },
-  { id: 'flooding', nameZh: '水浸', nameEn: 'Flooding', category: 'natural' },
+  { id: 'typhoon-storm-surge', nameZh: '超強颱風與風暴潮', nameEn: 'Super Typhoon and Storm Surge', category: 'natural' },
+  { id: 'heavy-rain-flooding', nameZh: '暴雨（黑/紅）及水浸', nameEn: 'Heavy Rain (Black/Red) and Flooding', category: 'natural' },
 
   // 科技與設施危害 (Technical & Facility Hazards)
   { id: 'power-outage', nameZh: '停電', nameEn: 'Power Outage', category: 'technical' },
