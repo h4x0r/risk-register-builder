@@ -235,79 +235,64 @@ export function SinglePageView() {
             </CardTitle>
           </CardHeader>
           <CardContent className="py-2">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b">
-                    <th className="p-2 text-center font-medium border-r" colSpan={2}>{t('controlCapability', language)}</th>
-                    <th className="p-2 text-center font-medium" rowSpan={3}>{t('riskLevel', language)}</th>
-                    <th className="p-2" rowSpan={3}></th>
-                  </tr>
-                  <tr className="border-b text-xs text-muted-foreground">
-                    <th className="p-1">{language === 'zh-TW' ? '內部' : 'Int'}</th>
-                    <th className="p-1 border-r">{language === 'zh-TW' ? '外部' : 'Ext'}</th>
-                  </tr>
-                  <tr className="border-b text-xs text-muted-foreground">
-                    <th className="p-1">
-                      <div className="flex justify-between">
-                        <span>{t('weak', language)}</span>
-                        <span>→</span>
-                        <span>{t('strong', language)}</span>
+            <div className="space-y-2">
+              {/* Header */}
+              <div className="flex items-center gap-2 text-xs text-muted-foreground border-b pb-2">
+                <div className="flex-1 text-center">
+                  <div className="font-medium text-foreground text-sm">{t('controlCapability', language)}</div>
+                  <div className="flex justify-between mt-1">
+                    <span>{t('weak', language)}</span>
+                    <span>→</span>
+                    <span>{t('strong', language)}</span>
+                  </div>
+                </div>
+                <div className="w-12 text-center font-medium text-foreground text-sm">{t('riskLevel', language)}</div>
+                <div className="w-6"></div>
+              </div>
+              {/* Entries */}
+              {entries.map((entry) => {
+                const riskLevel = calculateRiskLevel(entry);
+                return (
+                  <div key={entry.id} className="flex items-center gap-2 border-b pb-2">
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-muted-foreground w-8">{language === 'zh-TW' ? '外部' : 'Ext'}</span>
+                        <CompactRating
+                          value={entry.controlExternal}
+                          onChange={(v) => updateEntry(entry.id, { controlExternal: v })}
+                          reversed
+                        />
                       </div>
-                    </th>
-                    <th className="p-1 border-r">
-                      <div className="flex justify-between">
-                        <span>{t('weak', language)}</span>
-                        <span>→</span>
-                        <span>{t('strong', language)}</span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-muted-foreground w-8">{language === 'zh-TW' ? '內部' : 'Int'}</span>
+                        <CompactRating
+                          value={entry.controlInternal}
+                          onChange={(v) => updateEntry(entry.id, { controlInternal: v })}
+                          reversed
+                        />
                       </div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {entries.map((entry) => {
-                    const riskLevel = calculateRiskLevel(entry);
-                    return (
-                      <tr key={entry.id} className="border-b">
-                        <td className="p-2">
-                          <CompactRating
-                            value={entry.controlInternal}
-                            onChange={(v) => updateEntry(entry.id, { controlInternal: v })}
-                            reversed
-                          />
-                        </td>
-                        <td className="p-2 border-r">
-                          <CompactRating
-                            value={entry.controlExternal}
-                            onChange={(v) => updateEntry(entry.id, { controlExternal: v })}
-                            reversed
-                          />
-                        </td>
-                        <td className="p-2 text-center">
-                          <span
-                            className={cn(
-                              'inline-block rounded px-2 py-0.5 text-xs font-medium text-white',
-                              getRiskLevelColor(riskLevel)
-                            )}
-                          >
-                            {getRiskLevelLabel(riskLevel, language)}
-                          </span>
-                        </td>
-                        <td className="p-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
-                            onClick={() => removeEntry(entry.id)}
-                          >
-                            ×
-                          </Button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                    </div>
+                    <div className="w-12 text-center">
+                      <span
+                        className={cn(
+                          'inline-block rounded px-2 py-0.5 text-xs font-medium text-white',
+                          getRiskLevelColor(riskLevel)
+                        )}
+                      >
+                        {getRiskLevelLabel(riskLevel, language)}
+                      </span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                      onClick={() => removeEntry(entry.id)}
+                    >
+                      ×
+                    </Button>
+                  </div>
+                );
+              })}
             </div>
           </CardContent>
         </Card>
