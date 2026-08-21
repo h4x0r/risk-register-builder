@@ -227,6 +227,40 @@ export const translations = {
     en: 'Custom',
   },
 
+  // Learning
+  learn: {
+    'zh-TW': '學習',
+    en: 'Learn',
+  },
+  learnTitle: {
+    'zh-TW': '風險管理標準與框架',
+    en: 'Risk Standards & Frameworks',
+  },
+  learnSubtitle: {
+    'zh-TW': '本工具每一項評分要求，都對應一套公開標準。以下說明其出處、用法與限制。',
+    en: 'Every judgement this tool asks you to make comes from a published standard. Here is where each one comes from, how to use it, and where it stops working.',
+  },
+  furtherReading: {
+    'zh-TW': '參考資料',
+    en: 'References',
+  },
+  freeToRead: {
+    'zh-TW': '免費閱讀',
+    en: 'Free',
+  },
+  paidStandard: {
+    'zh-TW': '須購買',
+    en: 'Paid',
+  },
+  whyThisMatters: {
+    'zh-TW': '重點',
+    en: 'The point',
+  },
+  learnMoreAbout: {
+    'zh-TW': '了解更多：',
+    en: 'Learn about:',
+  },
+
   // Taxonomy
   searchThreats: {
     'zh-TW': '搜尋威脅庫',

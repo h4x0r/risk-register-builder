@@ -25,6 +25,7 @@ import {
   DEFAULT_ENTRY_VALUES,
 } from '@/lib/constants';
 import { searchPresets, presetsForCategory, categoryLabel } from '@/lib/taxonomy';
+import { LearnLink } from '@/components/learn/LearnDialog';
 import { calculateRiskLevel, getRiskLevelLabel, getRiskLevelColor, getMatrixPosition } from '@/lib/calculations';
 import { t } from '@/lib/i18n';
 import { Language, ThreatCategory, ThreatEntry, ThreatSource } from '@/types';
@@ -71,35 +72,56 @@ function TaxonomyChips({ entry, language }: { entry: ThreatEntry; language: Lang
 
   if (!entry.source && !entry.pillars?.length && !entry.stride?.length) return null;
 
+  // Every chip is a way into the lesson behind it, so the explanation sits one click
+  // from the judgement rather than in a manual nobody opens.
   return (
     <div className="mt-1 flex flex-wrap items-center gap-1">
       {entry.source && (
-        <span
-          className={cn('rounded px-1.5 py-0.5 text-[10px] font-medium', SOURCE_STYLES[entry.source])}
-          title={`${t('threatSource', language)} (NIST SP 800-30): ${pick(SOURCE_LABELS[entry.source])}`}
+        <LearnLink
+          topicId="sources"
+          title={`${t('learnMoreAbout', language)} ${t('threatSource', language)} — NIST SP 800-30 Rev. 1`}
+          className={cn(
+            'rounded px-1.5 py-0.5 text-[10px] font-medium transition-opacity hover:opacity-75',
+            SOURCE_STYLES[entry.source]
+          )}
         >
           {pick(SOURCE_LABELS[entry.source])}
-        </span>
+        </LearnLink>
       )}
       {entry.pillars?.map((pillar) => (
-        <span
+        <LearnLink
           key={pillar}
-          className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground"
-          title={t('pptPillar', language)}
+          topicId="ppt"
+          title={`${t('learnMoreAbout', language)} ${t('pptPillar', language)}`}
+          className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground transition-opacity hover:opacity-75"
         >
           {pick(PILLAR_LABELS[pillar])}
-        </span>
+        </LearnLink>
       ))}
       {entry.stride?.map((cls) => (
-        <span
+        <LearnLink
           key={cls}
-          className="rounded border border-purple-300 bg-purple-50 px-1 py-0.5 font-mono text-[10px] font-bold text-purple-800 dark:border-purple-800 dark:bg-purple-950 dark:text-purple-200"
+          topicId="stride"
           title={`STRIDE — ${pick(STRIDE_LABELS[cls])} · ${t('securityProperty', language)}: ${pick(PROPERTY_LABELS[STRIDE_PROPERTY[cls]])}`}
+          className="rounded border border-purple-300 bg-purple-50 px-1 py-0.5 font-mono text-[10px] font-bold text-purple-800 transition-opacity hover:opacity-75 dark:border-purple-800 dark:bg-purple-950 dark:text-purple-200"
         >
           {STRIDE_LABELS[cls].short}
-        </span>
+        </LearnLink>
       ))}
     </div>
+  );
+}
+
+/** A "why" affordance beside a section heading. */
+function LearnHint({ topicId, label }: { topicId: string; label: string }) {
+  return (
+    <LearnLink
+      topicId={topicId}
+      title={label}
+      className="ml-1.5 inline-flex h-4 w-4 items-center justify-center rounded-full border border-muted-foreground/40 text-[10px] font-semibold text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+    >
+      ?
+    </LearnLink>
   );
 }
 
@@ -234,6 +256,7 @@ export function SinglePageView() {
           <CardHeader className="py-3">
             <CardTitle className="text-base">
               {language === 'zh-TW' ? '固有風險' : 'Inherent Risk'}
+              <LearnHint topicId="risk-basics" label={t('learnMoreAbout', language)} />
             </CardTitle>
           </CardHeader>
           <CardContent className="py-2">
@@ -324,7 +347,10 @@ export function SinglePageView() {
         {/* Risk Matrix (Center) */}
         <Card className="lg:col-span-3">
           <CardHeader className="py-3 px-3">
-            <CardTitle className="text-base">{t('riskMatrix', language)}</CardTitle>
+            <CardTitle className="text-base">
+              {t('riskMatrix', language)}
+              <LearnHint topicId="matrix" label={t('learnMoreAbout', language)} />
+            </CardTitle>
           </CardHeader>
           <CardContent className="px-2 py-2">
             <RiskMatrix entries={entries} />
@@ -336,6 +362,7 @@ export function SinglePageView() {
           <CardHeader className="py-3">
             <CardTitle className="text-base">
               {language === 'zh-TW' ? '剩餘風險' : 'Residual Risk'}
+              <LearnHint topicId="scoring" label={t('learnMoreAbout', language)} />
             </CardTitle>
           </CardHeader>
           <CardContent className="py-2">
@@ -405,7 +432,10 @@ export function SinglePageView() {
       {/* Risk Register Table */}
       <Card>
         <CardHeader className="py-3">
-          <CardTitle className="text-base">{t('riskRegister', language)}</CardTitle>
+          <CardTitle className="text-base">
+            {t('riskRegister', language)}
+            <LearnHint topicId="treatment" label={t('learnMoreAbout', language)} />
+          </CardTitle>
         </CardHeader>
         <CardContent className="py-2">
           <div className="overflow-x-auto">
@@ -413,7 +443,10 @@ export function SinglePageView() {
               <thead>
                 <tr className="border-b">
                   <th className="p-2 text-left font-medium">{t('threat', language)}</th>
-                  <th className="p-2 text-left font-medium">{t('category', language)}</th>
+                  <th className="p-2 text-left font-medium">
+                    {t('category', language)}
+                    <LearnHint topicId="categories" label={t('learnMoreAbout', language)} />
+                  </th>
                   <th className="p-2 text-left font-medium">{t('vulnerability', language)}</th>
                   <th className="p-2 text-left font-medium">{t('impact', language)}</th>
                   <th className="p-2 text-center font-medium">{t('riskLevel', language)}</th>

@@ -84,6 +84,11 @@ Ten domains, ordered as they appear in the UI. ISO/IEC 27005's threat-type group
 supply the backbone; personnel, supply-chain and compliance widen it so that people,
 process and third-party risk have a home.
 
+**Edition note.** The threat-type list is published as **Annex C (Examples of typical
+threats) in ISO/IEC 27005:2018**. The 2022 edition restructures that material into
+Annex A, so a reader who opens the current text looking for Annex C will not find it.
+Cite the edition you actually consulted.
+
 | Category | ISO 27005 lineage | Typical source |
 |---|---|---|
 | `natural` — Natural & Environmental Hazards | Natural events | Environmental |
@@ -130,6 +135,8 @@ Tags the entry already carries are never overwritten, so a user who reclassified
 - ISO/IEC 27005:2022 — *Information security, cybersecurity and privacy protection —
   Guidance on managing information security risks*.
   <https://www.iso.org/standard/80585.html>
+  (The threat-type list itself is Annex C of the **2018** edition; the 2022 edition
+  folds that material into Annex A.)
 - NIST SP 800-30 Rev. 1 — *Guide for Conducting Risk Assessments*, Table D-2,
   Taxonomy of Threat Sources.
   <https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-30r1.pdf>

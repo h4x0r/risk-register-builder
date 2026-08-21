@@ -8,6 +8,7 @@
  *     compromise of information, technical failures, unauthorised actions,
  *     compromise of functions), widened to cover people, third-party and
  *     regulatory risk so one register can hold both a typhoon and a ransomware event.
+ *     The list is Annex C of ISO/IEC 27005:2018; the 2022 edition moves it to Annex A.
  *  2. ThreatSource — NIST SP 800-30 Rev. 1, Table D-2 (Taxonomy of Threat Sources).
  *  3. PptPillar — the People / Process / Technology triad. Multi-valued: phishing
  *     is people AND technology, and pretending otherwise loses information.
