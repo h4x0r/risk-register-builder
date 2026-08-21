@@ -82,6 +82,42 @@ export function searchPresets(query: string): ThreatPreset[] {
 }
 
 /**
+ * Bumped whenever the taxonomy changes shape. Zustand runs `migrate` for any
+ * persisted state below this version.
+ */
+export const TAXONOMY_SCHEMA_VERSION = 1;
+
+/**
+ * Bring localStorage-persisted state up to the current taxonomy.
+ *
+ * Entries persist outside the share-link path, so rehydration never passes through
+ * decodeEntries and needs migrating in its own right — a returning user arrives
+ * holding `category: 'technical'`, which has no label and takes the page down.
+ *
+ * Deliberately tolerant of shape: this input is whatever happens to be in the
+ * browser, including state written by a build that no longer exists.
+ */
+export function migratePersistedState(persisted: unknown): { entries: ThreatEntry[]; [key: string]: unknown } {
+  const state = (persisted ?? {}) as Record<string, unknown>;
+  const entries = Array.isArray(state.entries) ? (state.entries as ThreatEntry[]) : [];
+
+  return { ...state, entries: migrateEntries(entries) };
+}
+
+/**
+ * Category label, falling back to the raw value when the category is unknown.
+ *
+ * Defence in depth behind migratePersistedState: showing an odd raw string is a
+ * visible signal that something needs migrating, where a bare lookup would throw
+ * and take the whole page with it.
+ */
+export function categoryLabel(category: ThreatCategory, language: Language): string {
+  const label = CATEGORY_LABELS[category];
+  if (!label) return String(category);
+  return language === 'zh-TW' ? label.zh : label.en;
+}
+
+/**
  * The four taxonomy axes as display strings, for exports and print views.
  *
  * Absent tags render as "-" rather than being interpolated straight into a
@@ -96,7 +132,7 @@ export function taxonomyLabels(
   const DASH = '-';
 
   return {
-    category: pick(CATEGORY_LABELS[entry.category]),
+    category: categoryLabel(entry.category, language),
     source: entry.source ? pick(SOURCE_LABELS[entry.source]) : DASH,
     pillars: entry.pillars?.length
       ? entry.pillars.map((p) => pick(PILLAR_LABELS[p])).join(', ')

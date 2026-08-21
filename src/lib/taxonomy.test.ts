@@ -1,5 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { migrateEntry, migrateEntries, searchPresets, taxonomyLabels, LEGACY_CATEGORY_FALLBACK } from './taxonomy';
+import {
+  migrateEntry,
+  migrateEntries,
+  migratePersistedState,
+  searchPresets,
+  taxonomyLabels,
+  categoryLabel,
+  LEGACY_CATEGORY_FALLBACK,
+} from './taxonomy';
 import {
   THREAT_PRESETS,
   CATEGORY_ORDER,
@@ -157,6 +165,40 @@ describe('searchPresets', () => {
 
   it('returns an empty list when nothing matches', () => {
     expect(searchPresets('zzzznotathreat')).toEqual([]);
+  });
+});
+
+describe('migratePersistedState', () => {
+  it('migrates entries rehydrated from localStorage', () => {
+    // The persist path never touches decodeEntries, so it needs its own migration.
+    // Without one the category lookup dereferences undefined and the page dies.
+    const migrated = migratePersistedState({
+      language: 'en',
+      entries: [legacyEntry('fire', 'technical'), legacyEntry('cyber-attack', 'security')],
+    });
+
+    expect(migrated.entries?.map((e) => e.category)).toEqual(['physical', 'cyber']);
+    expect(migrated.language).toBe('en');
+  });
+
+  it('survives state that is missing, empty or malformed', () => {
+    expect(migratePersistedState(undefined).entries).toEqual([]);
+    expect(migratePersistedState(null).entries).toEqual([]);
+    expect(migratePersistedState({}).entries).toEqual([]);
+    expect(migratePersistedState({ entries: 'not-an-array' }).entries).toEqual([]);
+  });
+});
+
+describe('categoryLabel', () => {
+  it('labels a known category', () => {
+    expect(categoryLabel('cyber', 'en')).toBe('Cyber Attack');
+    expect(categoryLabel('cyber', 'zh-TW')).toBe('網絡攻擊');
+  });
+
+  it('degrades to the raw value instead of throwing on an unknown category', () => {
+    // Defence in depth behind the migration: one unlabelled category must not be
+    // able to take down the whole page.
+    expect(categoryLabel('technical' as ThreatCategory, 'en')).toBe('technical');
   });
 });
 

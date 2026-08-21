@@ -24,7 +24,7 @@ import {
   PROPERTY_LABELS,
   DEFAULT_ENTRY_VALUES,
 } from '@/lib/constants';
-import { searchPresets, presetsForCategory } from '@/lib/taxonomy';
+import { searchPresets, presetsForCategory, categoryLabel } from '@/lib/taxonomy';
 import { calculateRiskLevel, getRiskLevelLabel, getRiskLevelColor, getMatrixPosition } from '@/lib/calculations';
 import { t } from '@/lib/i18n';
 import { Language, ThreatCategory, ThreatEntry, ThreatSource } from '@/types';
@@ -431,9 +431,7 @@ export function SinglePageView() {
                         <TaxonomyChips entry={entry} language={language} />
                       </td>
                       <td className="p-2 align-top text-xs text-muted-foreground">
-                        {language === 'zh-TW'
-                          ? CATEGORY_LABELS[entry.category].zh
-                          : CATEGORY_LABELS[entry.category].en}
+                        {categoryLabel(entry.category, language)}
                       </td>
                       <td className="p-2 text-center font-medium">
                         {matrixPos.y}
