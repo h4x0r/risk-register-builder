@@ -3,6 +3,7 @@
 import ExcelJS from 'exceljs';
 import { ThreatEntry, Language } from '@/types';
 import { calculateRiskLevel, getRiskLevelLabel, getMatrixPosition } from '@/lib/calculations';
+import { taxonomyLabels } from '@/lib/taxonomy';
 
 export async function exportToExcel(entries: ThreatEntry[], language: Language): Promise<void> {
   const workbook = new ExcelJS.Workbook();
@@ -59,8 +60,8 @@ export async function exportToExcel(entries: ThreatEntry[], language: Language):
   const sheet2 = workbook.addWorksheet(language === 'zh-TW' ? '風險登記冊' : 'Risk Register');
 
   const headers2 = language === 'zh-TW'
-    ? ['威脅', '脆弱性', '影響', '風險等級', '緩解策略']
-    : ['Threat', 'Vulnerability', 'Impact', 'Risk Level', 'Mitigation Strategy'];
+    ? ['威脅', '類別', '威脅來源', '人員／流程／科技', 'STRIDE', '脆弱性', '影響', '風險等級', '緩解策略']
+    : ['Threat', 'Category', 'Threat Source', 'People/Process/Technology', 'STRIDE', 'Vulnerability', 'Impact', 'Risk Level', 'Mitigation Strategy'];
 
   sheet2.addRow(headers2);
 
@@ -77,8 +78,13 @@ export async function exportToExcel(entries: ThreatEntry[], language: Language):
   entries.forEach((entry) => {
     const riskLevel = calculateRiskLevel(entry);
     const matrixPos = getMatrixPosition(entry);
+    const taxonomy = taxonomyLabels(entry, language);
     sheet2.addRow([
       language === 'zh-TW' ? entry.name : (entry.nameEn || entry.name),
+      taxonomy.category,
+      taxonomy.source,
+      taxonomy.pillars,
+      taxonomy.stride,
       matrixPos.y, // Vulnerability = probability (Y-axis)
       matrixPos.x, // Impact = avg impact (X-axis)
       getRiskLevelLabel(riskLevel, language),
@@ -88,7 +94,11 @@ export async function exportToExcel(entries: ThreatEntry[], language: Language):
 
   // Set column widths
   sheet2.columns = [
-    { width: 20 },
+    { width: 24 },
+    { width: 22 },
+    { width: 14 },
+    { width: 24 },
+    { width: 10 },
     { width: 12 },
     { width: 12 },
     { width: 12 },

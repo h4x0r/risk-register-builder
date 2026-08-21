@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { migrateEntry, LEGACY_CATEGORY_FALLBACK } from './taxonomy';
+import { migrateEntry, migrateEntries, searchPresets, taxonomyLabels, LEGACY_CATEGORY_FALLBACK } from './taxonomy';
 import {
   THREAT_PRESETS,
   CATEGORY_ORDER,
@@ -112,6 +112,83 @@ describe('migrateEntry', () => {
     expect(Object.keys(LEGACY_CATEGORY_FALLBACK).sort()).toEqual(
       ['natural', 'security', 'technical'].sort()
     );
+  });
+});
+
+describe('migrateEntries', () => {
+  it('migrates every entry in the list', () => {
+    const migrated = migrateEntries([
+      legacyEntry('fire', 'technical'),
+      legacyEntry('cyber-attack', 'security'),
+    ]);
+
+    expect(migrated.map((e) => e.category)).toEqual(['physical', 'cyber']);
+  });
+
+  it('returns an empty list unchanged', () => {
+    expect(migrateEntries([])).toEqual([]);
+  });
+});
+
+describe('searchPresets', () => {
+  it('matches on the English name, case-insensitively', () => {
+    const ids = searchPresets('ransomware').map((p) => p.id);
+    expect(ids).toContain('ransomware');
+
+    expect(searchPresets('RANSOMWARE').map((p) => p.id)).toEqual(ids);
+  });
+
+  it('matches on the Traditional Chinese name', () => {
+    const ids = searchPresets('勒索').map((p) => p.id);
+    expect(ids).toContain('ransomware');
+  });
+
+  it('searches across every category, not just one', () => {
+    // "failure" appears in infrastructure, physical, technology and information.
+    const categories = new Set(searchPresets('failure').map((p) => p.category));
+    expect(categories.size).toBeGreaterThan(2);
+  });
+
+  it('returns an empty list for a blank query rather than everything', () => {
+    // Returning the full library on a blank query would defeat the filter.
+    expect(searchPresets('')).toEqual([]);
+    expect(searchPresets('   ')).toEqual([]);
+  });
+
+  it('returns an empty list when nothing matches', () => {
+    expect(searchPresets('zzzznotathreat')).toEqual([]);
+  });
+});
+
+describe('taxonomyLabels', () => {
+  const ransomware = migrateEntry(legacyEntry('ransomware', 'cyber'));
+
+  it('renders every axis in English', () => {
+    const labels = taxonomyLabels(ransomware, 'en');
+
+    expect(labels.category).toBe('Cyber Attack');
+    expect(labels.source).toBe('Adversarial');
+    expect(labels.pillars).toBe('Technology, Process');
+    expect(labels.stride).toBe('T, D');
+  });
+
+  it('renders every axis in Traditional Chinese', () => {
+    const labels = taxonomyLabels(ransomware, 'zh-TW');
+
+    expect(labels.category).toBe('網絡攻擊');
+    expect(labels.source).toBe('敵對');
+    expect(labels.pillars).toBe('科技, 流程');
+  });
+
+  it('emits a dash, never "undefined", for an untagged custom entry', () => {
+    // A bare string template would put the literal text "undefined" into an
+    // exported spreadsheet cell, which reads as data.
+    const labels = taxonomyLabels(legacyEntry('my-own-threat', 'custom'), 'en');
+
+    expect(labels.source).toBe('-');
+    expect(labels.pillars).toBe('-');
+    expect(labels.stride).toBe('-');
+    expect(Object.values(labels).join(' ')).not.toContain('undefined');
   });
 });
 

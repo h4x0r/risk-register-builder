@@ -227,6 +227,40 @@ export const translations = {
     en: 'Custom',
   },
 
+  // Taxonomy
+  searchThreats: {
+    'zh-TW': '搜尋威脅庫',
+    en: 'Search threat library',
+  },
+  searchResults: {
+    'zh-TW': '搜尋結果',
+    en: 'Search results',
+  },
+  noMatches: {
+    'zh-TW': '沒有相符的威脅',
+    en: 'No matching threats',
+  },
+  threatSource: {
+    'zh-TW': '威脅來源',
+    en: 'Threat Source',
+  },
+  pptPillar: {
+    'zh-TW': '人員／流程／科技',
+    en: 'People / Process / Technology',
+  },
+  strideClass: {
+    'zh-TW': 'STRIDE 分類',
+    en: 'STRIDE Class',
+  },
+  securityProperty: {
+    'zh-TW': '受影響的保安屬性',
+    en: 'Security Property Affected',
+  },
+  category: {
+    'zh-TW': '類別',
+    en: 'Category',
+  },
+
   // Expert Mode
   addThreat: {
     'zh-TW': '新增威脅',

@@ -1,5 +1,6 @@
 import LZString from 'lz-string';
 import { ThreatEntry } from '@/types';
+import { migrateEntries } from './taxonomy';
 
 export const URL_LENGTH_WARNING_THRESHOLD = 2000;
 
@@ -14,7 +15,9 @@ export function decodeEntries(encoded: string): ThreatEntry[] | null {
   try {
     const json = LZString.decompressFromEncodedURIComponent(encoded);
     if (!json) return null;
-    return JSON.parse(json);
+    // Links issued before the taxonomy expansion carry the old three-category
+    // model, so every decode runs through the migration.
+    return migrateEntries(JSON.parse(json) as ThreatEntry[]);
   } catch {
     return null;
   }

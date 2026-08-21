@@ -22,9 +22,13 @@ test('risk register shows matrix coordinates that update with ratings', async ({
   const riskRegisterRow = riskRegisterTable.locator('tbody tr').first();
   const cells = riskRegisterRow.locator('td');
 
+  // Columns: 0 Threat | 1 Category | 2 Vulnerability | 3 Impact | 4 Risk | 5 Mitigation
+  const VULNERABILITY_COL = 2;
+  const IMPACT_COL = 3;
+
   // Initial values: all ratings at 3, so vulnerability=3, impact=3
-  const initialVulnerability = await cells.nth(1).textContent();
-  const initialImpact = await cells.nth(2).textContent();
+  const initialVulnerability = await cells.nth(VULNERABILITY_COL).textContent();
+  const initialImpact = await cells.nth(IMPACT_COL).textContent();
   console.log('Initial - Vulnerability:', initialVulnerability, 'Impact:', initialImpact);
   expect(initialVulnerability?.trim()).toBe('3');
   expect(initialImpact?.trim()).toBe('3');
@@ -39,7 +43,7 @@ test('risk register shows matrix coordinates that update with ratings', async ({
   await page.screenshot({ path: 'test-results/02-after-prob-change.png', fullPage: true });
 
   // Vulnerability should now be 5 (Y-axis = probability)
-  const afterProbVuln = await cells.nth(1).textContent();
+  const afterProbVuln = await cells.nth(VULNERABILITY_COL).textContent();
   console.log('After prob change - Vulnerability:', afterProbVuln);
   expect(afterProbVuln?.trim()).toBe('5');
 
@@ -50,7 +54,7 @@ test('risk register shows matrix coordinates that update with ratings', async ({
   await page.screenshot({ path: 'test-results/03-after-impact-change.png', fullPage: true });
 
   // Impact should now be 4 (X-axis = round((5+3+3)/3) = round(3.67) = 4)
-  const afterImpactValue = await cells.nth(2).textContent();
+  const afterImpactValue = await cells.nth(IMPACT_COL).textContent();
   console.log('After impact change - Impact:', afterImpactValue);
   expect(afterImpactValue?.trim()).toBe('4');
 
@@ -62,7 +66,7 @@ test('risk register shows matrix coordinates that update with ratings', async ({
   await page.screenshot({ path: 'test-results/04-all-impacts-5.png', fullPage: true });
 
   // Impact should now be 5 (X-axis = round((5+5+5)/3) = 5)
-  const finalImpact = await cells.nth(2).textContent();
+  const finalImpact = await cells.nth(IMPACT_COL).textContent();
   console.log('Final - Impact:', finalImpact);
   expect(finalImpact?.trim()).toBe('5');
 

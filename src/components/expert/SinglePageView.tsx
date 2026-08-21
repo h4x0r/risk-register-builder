@@ -13,10 +13,21 @@ import {
 } from '@/components/ui/select';
 import { useRiskRegister, createCustomEntry } from '@/hooks/useRiskRegister';
 import { RiskMatrix } from '@/components/risk-matrix/RiskMatrix';
-import { THREAT_PRESETS, CATEGORY_LABELS, DEFAULT_ENTRY_VALUES } from '@/lib/constants';
+import {
+  THREAT_PRESETS,
+  CATEGORY_ORDER,
+  CATEGORY_LABELS,
+  SOURCE_LABELS,
+  PILLAR_LABELS,
+  STRIDE_LABELS,
+  STRIDE_PROPERTY,
+  PROPERTY_LABELS,
+  DEFAULT_ENTRY_VALUES,
+} from '@/lib/constants';
+import { searchPresets, presetsForCategory } from '@/lib/taxonomy';
 import { calculateRiskLevel, getRiskLevelLabel, getRiskLevelColor, getMatrixPosition } from '@/lib/calculations';
 import { t } from '@/lib/i18n';
-import { ThreatCategory, ThreatEntry } from '@/types';
+import { Language, ThreatCategory, ThreatEntry, ThreatSource } from '@/types';
 import { cn } from '@/lib/utils';
 
 function CompactRating({ value, onChange, reversed }: { value: number; onChange: (v: number) => void; reversed?: boolean }) {
@@ -41,14 +52,67 @@ function CompactRating({ value, onChange, reversed }: { value: number; onChange:
   );
 }
 
+/** NIST SP 800-30 threat source, colour-coded so the register scans at a glance. */
+const SOURCE_STYLES: Record<ThreatSource, string> = {
+  adversarial: 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200',
+  accidental: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200',
+  structural: 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-200',
+  environmental: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200',
+};
+
+/**
+ * The taxonomy tags for one entry, rendered under its name.
+ *
+ * Native `title` tooltips rather than the Radix tooltip: these are glosses on an
+ * abbreviation, not interactive content, and they must survive print and PDF export.
+ */
+function TaxonomyChips({ entry, language }: { entry: ThreatEntry; language: Language }) {
+  const pick = (l: { zh: string; en: string }) => (language === 'zh-TW' ? l.zh : l.en);
+
+  if (!entry.source && !entry.pillars?.length && !entry.stride?.length) return null;
+
+  return (
+    <div className="mt-1 flex flex-wrap items-center gap-1">
+      {entry.source && (
+        <span
+          className={cn('rounded px-1.5 py-0.5 text-[10px] font-medium', SOURCE_STYLES[entry.source])}
+          title={`${t('threatSource', language)} (NIST SP 800-30): ${pick(SOURCE_LABELS[entry.source])}`}
+        >
+          {pick(SOURCE_LABELS[entry.source])}
+        </span>
+      )}
+      {entry.pillars?.map((pillar) => (
+        <span
+          key={pillar}
+          className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground"
+          title={t('pptPillar', language)}
+        >
+          {pick(PILLAR_LABELS[pillar])}
+        </span>
+      ))}
+      {entry.stride?.map((cls) => (
+        <span
+          key={cls}
+          className="rounded border border-purple-300 bg-purple-50 px-1 py-0.5 font-mono text-[10px] font-bold text-purple-800 dark:border-purple-800 dark:bg-purple-950 dark:text-purple-200"
+          title={`STRIDE — ${pick(STRIDE_LABELS[cls])} · ${t('securityProperty', language)}: ${pick(PROPERTY_LABELS[STRIDE_PROPERTY[cls]])}`}
+        >
+          {STRIDE_LABELS[cls].short}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export function SinglePageView() {
   const { entries, language, addEntry, updateEntry, removeEntry } = useRiskRegister();
   const [selectedCategory, setSelectedCategory] = useState<ThreatCategory>('natural');
   const [selectedPreset, setSelectedPreset] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [customName, setCustomName] = useState('');
 
-  const categories: ThreatCategory[] = ['natural', 'technical', 'security'];
-  const presets = THREAT_PRESETS.filter((p) => p.category === selectedCategory);
+  // A free-text query searches the whole library; otherwise the category scopes it.
+  const searching = searchQuery.trim().length > 0;
+  const presets = searching ? searchPresets(searchQuery) : presetsForCategory(selectedCategory);
 
   const handleAddPreset = () => {
     if (!selectedPreset) return;
@@ -60,9 +124,13 @@ export function SinglePageView() {
       name: preset.nameZh,
       nameEn: preset.nameEn,
       category: preset.category,
+      source: preset.source,
+      pillars: preset.pillars,
+      stride: preset.stride,
       ...DEFAULT_ENTRY_VALUES,
     });
     setSelectedPreset('');
+    setSearchQuery('');
   };
 
   const handleAddCustom = () => {
@@ -79,22 +147,45 @@ export function SinglePageView() {
           <CardTitle className="text-base">{t('addThreat', language)}</CardTitle>
         </CardHeader>
         <CardContent className="py-2">
-          <div className="flex flex-wrap gap-2">
-            <Select value={selectedCategory} onValueChange={(v) => setSelectedCategory(v as ThreatCategory)}>
-              <SelectTrigger className="w-40">
+          <div className="flex flex-wrap items-center gap-2">
+            <Select
+              value={selectedCategory}
+              onValueChange={(v) => {
+                setSelectedCategory(v as ThreatCategory);
+                setSelectedPreset('');
+                setSearchQuery('');
+              }}
+              disabled={searching}
+            >
+              <SelectTrigger className="w-56">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {categories.map((cat) => (
+                {CATEGORY_ORDER.map((cat) => (
                   <SelectItem key={cat} value={cat}>
                     {language === 'zh-TW' ? CATEGORY_LABELS[cat].zh : CATEGORY_LABELS[cat].en}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            <Input
+              placeholder={t('searchThreats', language)}
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setSelectedPreset('');
+              }}
+              className="w-44"
+            />
             <Select value={selectedPreset} onValueChange={setSelectedPreset}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder={language === 'zh-TW' ? '選擇威脅' : 'Select threat'} />
+              <SelectTrigger className="w-64">
+                <SelectValue
+                  placeholder={
+                    searching && presets.length === 0
+                      ? t('noMatches', language)
+                      : language === 'zh-TW' ? '選擇威脅' : 'Select threat'
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
                 {presets.map((preset) => (
@@ -104,6 +195,13 @@ export function SinglePageView() {
                     disabled={entries.some((e) => e.id === preset.id)}
                   >
                     {language === 'zh-TW' ? preset.nameZh : preset.nameEn}
+                    {searching && (
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        {language === 'zh-TW'
+                          ? CATEGORY_LABELS[preset.category].zh
+                          : CATEGORY_LABELS[preset.category].en}
+                      </span>
+                    )}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -116,11 +214,16 @@ export function SinglePageView() {
               placeholder={language === 'zh-TW' ? '自訂威脅名稱' : 'Custom threat name'}
               value={customName}
               onChange={(e) => setCustomName(e.target.value)}
-              className="w-48"
+              className="w-44"
             />
             <Button onClick={handleAddCustom} disabled={!customName.trim()} size="sm">
               + {t('add', language)}
             </Button>
+            <span className="ml-auto self-center text-xs text-muted-foreground">
+              {searching
+                ? `${t('searchResults', language)}: ${presets.length}`
+                : `${THREAT_PRESETS.length} ${language === 'zh-TW' ? '項威脅' : 'threats'}`}
+            </span>
           </div>
         </CardContent>
       </Card>
@@ -182,8 +285,9 @@ export function SinglePageView() {
                 <tbody>
                   {entries.map((entry) => (
                     <tr key={entry.id} className="border-b">
-                      <td className="p-2 font-medium border-r">
+                      <td className="p-2 font-medium border-r align-top">
                         {language === 'zh-TW' ? entry.name : (entry.nameEn || entry.name)}
+                        <TaxonomyChips entry={entry} language={language} />
                       </td>
                       <td className="p-2 border-r">
                         <CompactRating
@@ -309,6 +413,7 @@ export function SinglePageView() {
               <thead>
                 <tr className="border-b">
                   <th className="p-2 text-left font-medium">{t('threat', language)}</th>
+                  <th className="p-2 text-left font-medium">{t('category', language)}</th>
                   <th className="p-2 text-left font-medium">{t('vulnerability', language)}</th>
                   <th className="p-2 text-left font-medium">{t('impact', language)}</th>
                   <th className="p-2 text-center font-medium">{t('riskLevel', language)}</th>
@@ -321,8 +426,14 @@ export function SinglePageView() {
                   const matrixPos = getMatrixPosition(entry);
                   return (
                     <tr key={entry.id} className="border-b">
-                      <td className="p-2 font-medium">
+                      <td className="p-2 font-medium align-top">
                         {language === 'zh-TW' ? entry.name : (entry.nameEn || entry.name)}
+                        <TaxonomyChips entry={entry} language={language} />
+                      </td>
+                      <td className="p-2 align-top text-xs text-muted-foreground">
+                        {language === 'zh-TW'
+                          ? CATEGORY_LABELS[entry.category].zh
+                          : CATEGORY_LABELS[entry.category].en}
                       </td>
                       <td className="p-2 text-center font-medium">
                         {matrixPos.y}

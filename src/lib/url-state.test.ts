@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import LZString from 'lz-string';
 import { encodeEntries, decodeEntries, generateShareUrl, URL_LENGTH_WARNING_THRESHOLD } from './url-state';
 import { ThreatEntry } from '@/types';
 
@@ -49,6 +50,31 @@ describe('URL State Encoding', () => {
     it('returns null for empty string', () => {
       const decoded = decodeEntries('');
       expect(decoded).toBeNull();
+    });
+
+    it('migrates a share link issued against the pre-expansion taxonomy', () => {
+      // Hand-built to match what the old encoder produced: the three-category
+      // model, no taxonomy tags. Links like this are already in the wild.
+      const legacyPayload = JSON.stringify([
+        { id: 'fire', name: '火災', nameEn: 'Fire', category: 'technical',
+          probability: 4, impactLife: 5, impactAsset: 4, impactBusiness: 3,
+          controlInternal: 2, controlExternal: 2, mitigationStrategy: '消防演習' },
+        { id: 'cyber-attack', name: '網絡攻擊', nameEn: 'Cyber Attack', category: 'security',
+          probability: 3, impactLife: 1, impactAsset: 3, impactBusiness: 5,
+          controlInternal: 3, controlExternal: 3, mitigationStrategy: '' },
+      ]);
+      const encoded = LZString.compressToEncodedURIComponent(legacyPayload);
+
+      const decoded = decodeEntries(encoded);
+
+      expect(decoded).not.toBeNull();
+      expect(decoded!.map((e) => e.category)).toEqual(['physical', 'cyber']);
+      // Scores survive the migration untouched.
+      expect(decoded![0].probability).toBe(4);
+      expect(decoded![0].mitigationStrategy).toBe('消防演習');
+      // And the taxonomy tags are backfilled from the preset library.
+      expect(decoded![1].source).toBe('adversarial');
+      expect(decoded![1].stride).toContain('dos');
     });
   });
 
