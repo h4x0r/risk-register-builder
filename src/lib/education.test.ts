@@ -73,7 +73,7 @@ describe('learning content integrity', () => {
       for (const cite of topic.citations) {
         expect(cite.url, `${topic.id}: ${cite.ref}`).toMatch(/^https:\/\/[^\s]+$/);
         expect(cite.ref.trim(), `${topic.id} citation missing ref`).not.toBe('');
-        expect(typeof cite.free, `${topic.id}: ${cite.ref} must declare free`).toBe('boolean');
+        expect(['free', 'abstract', 'paid'], `${topic.id}: ${cite.ref} access`).toContain(cite.access);
       }
     }
   });
@@ -87,15 +87,19 @@ describe('learning content integrity', () => {
     }
   });
 
-  it('marks ISO standards as paid and NIST as free', () => {
+  it('labels access honestly for paywalls, abstracts and full text', () => {
     // Telling a student a paywalled standard is "further reading" without saying so
-    // wastes their time; this keeps the flag honest as citations are added.
+    // wastes their time; so does sending them to an abstract labelled "free".
     const all = LEARN_TOPICS.flatMap((t) => t.citations);
     for (const cite of all.filter((c) => c.url.includes('iso.org'))) {
-      expect(cite.free, `${cite.ref} is on iso.org and must be marked paid`).toBe(false);
+      expect(cite.access, `${cite.ref} is on iso.org and must be paid`).toBe('paid');
     }
     for (const cite of all.filter((c) => c.url.includes('nist.gov'))) {
-      expect(cite.free, `${cite.ref} is a NIST publication and is free`).toBe(true);
+      expect(cite.access, `${cite.ref} is a NIST publication and is free`).toBe('free');
+    }
+    // A PubMed record is the abstract, not the paper.
+    for (const cite of all.filter((c) => c.url.includes('pubmed.ncbi.nlm.nih.gov'))) {
+      expect(cite.access, `${cite.ref} resolves to an abstract`).toBe('abstract');
     }
   });
 
@@ -157,7 +161,10 @@ describe('the scoring lesson matches the code it describes', () => {
     const matrix = getLearnTopic('matrix')!;
     const text = matrix.paragraphs.map((p) => p.en).join(' ');
     expect(text).toContain('bottom-left cell');
-    expect(text).toContain('√f');
+    // The derivation is now set as LaTeX, so assert on the source the renderer reads.
+    expect(text).toContain('\\sqrt{f}');
+    // And the honest limit measured in invariant-probe.test.ts must be stated.
+    expect(text).toContain('one in six');
   });
 
   it('is right that strongest controls drive residual risk to zero', () => {

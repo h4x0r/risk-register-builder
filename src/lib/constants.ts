@@ -31,15 +31,15 @@ export const THREAT_PRESETS: ThreatPreset[] = [
   { id: 'air-pollution', nameZh: '嚴重空氣污染', nameEn: 'Severe Air Pollution', category: 'natural', source: 'environmental', pillars: ['people', 'process'] },
 
   // ── 基礎設施與公用服務中斷 (Infrastructure & Utility Disruption) ──────
-  { id: 'power-outage', nameZh: '停電', nameEn: 'Power Outage', category: 'infrastructure', source: 'structural', pillars: ['technology', 'process'] },
+  { id: 'power-outage', nameZh: '停電', nameEn: 'Power Outage', category: 'infrastructure', source: 'environmental', pillars: ['technology', 'process'] },
   { id: 'generator-failure', nameZh: '後備發電機故障', nameEn: 'Backup Generator Failure', category: 'infrastructure', source: 'structural', pillars: ['technology', 'process'] },
-  { id: 'water-supply-failure', nameZh: '食水供應中斷', nameEn: 'Water Supply Failure', category: 'infrastructure', source: 'structural', pillars: ['process'] },
-  { id: 'telecom-outage', nameZh: '電訊服務中斷', nameEn: 'Telecommunications Outage', category: 'infrastructure', source: 'structural', pillars: ['technology'] },
-  { id: 'internet-outage', nameZh: '互聯網服務中斷', nameEn: 'Internet / ISP Outage', category: 'infrastructure', source: 'structural', pillars: ['technology'] },
+  { id: 'water-supply-failure', nameZh: '食水供應中斷', nameEn: 'Water Supply Failure', category: 'infrastructure', source: 'environmental', pillars: ['process'] },
+  { id: 'telecom-outage', nameZh: '電訊服務中斷', nameEn: 'Telecommunications Outage', category: 'infrastructure', source: 'environmental', pillars: ['technology'] },
+  { id: 'internet-outage', nameZh: '互聯網服務中斷', nameEn: 'Internet / ISP Outage', category: 'infrastructure', source: 'environmental', pillars: ['technology'] },
   { id: 'hvac-failure', nameZh: '空調系統故障', nameEn: 'HVAC Failure', category: 'infrastructure', source: 'structural', pillars: ['technology'] },
   { id: 'elevator-failure', nameZh: '升降機故障', nameEn: 'Elevator Failure', category: 'infrastructure', source: 'structural', pillars: ['technology', 'process'] },
   { id: 'transport-disruption', nameZh: '公共交通中斷', nameEn: 'Public Transport Disruption', category: 'infrastructure', source: 'environmental', pillars: ['people', 'process'] },
-  { id: 'fuel-shortage', nameZh: '燃料短缺', nameEn: 'Fuel Shortage', category: 'infrastructure', source: 'structural', pillars: ['process'] },
+  { id: 'fuel-shortage', nameZh: '燃料短缺', nameEn: 'Fuel Shortage', category: 'infrastructure', source: 'environmental', pillars: ['process'] },
 
   // ── 實體保安與設施 (Physical Security & Facility) ─────────────────────
   { id: 'fire', nameZh: '火災', nameEn: 'Fire', category: 'physical', source: 'accidental', pillars: ['process', 'technology'] },

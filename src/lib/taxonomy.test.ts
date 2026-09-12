@@ -42,7 +42,10 @@ describe('migrateEntry', () => {
     const migrated = migrateEntry(legacyEntry('power-outage', 'technical'));
 
     expect(migrated.category).toBe('infrastructure');
-    expect(migrated.source).toBe('structural');
+    // Environmental, not structural: NIST SP 800-30 Rev. 1 Table D-2 lists
+    // "Infrastructure Failure/Outage — Telecommunications, Electrical Power" under
+    // ENVIRONMENTAL. Our own generator failing would be structural; the grid is not ours.
+    expect(migrated.source).toBe('environmental');
     expect(migrated.pillars).toContain('technology');
   });
 

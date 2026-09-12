@@ -83,6 +83,32 @@ function RatingScale({
 }) {
   const values = reversed ? [5, 4, 3, 2, 1] : [1, 2, 3, 4, 5];
 
+  /**
+   * Radio-group keyboard behaviour: one tab stop for the whole scale, arrows move
+   * between values. Without it a keyboard user tabs through five buttons per rating
+   * — thirty tab stops to score one threat — which is a barrier to finishing the
+   * exercise at all, not a nicety.
+   */
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    const index = values.indexOf(value);
+    let next: number | null = null;
+
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+      next = values[Math.min(index + 1, values.length - 1)];
+    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+      next = values[Math.max(index - 1, 0)];
+    } else if (event.key === 'Home') {
+      next = values[0];
+    } else if (event.key === 'End') {
+      next = values[values.length - 1];
+    }
+
+    if (next !== null && next !== value) {
+      event.preventDefault();
+      onChange(next);
+    }
+  };
+
   return (
     <div role="radiogroup" aria-label={label} className="flex gap-[3px]">
       {values.map((v) => (
@@ -92,6 +118,8 @@ function RatingScale({
           role="radio"
           aria-checked={value === v}
           aria-label={`${label} ${v}`}
+          tabIndex={value === v ? 0 : -1}
+          onKeyDown={onKeyDown}
           onClick={() => onChange(v)}
           className={cn(
             'h-6 w-6 rounded-[3px] font-mono text-[11px] transition-all',
@@ -329,6 +357,19 @@ function DeleteEntryButton({
   );
 }
 
+/**
+ * Stage number on a card title.
+ *
+ * The rail below only lays out on wide screens, where the columns exist to align
+ * with. On a phone the cards stack and the rail is gone, so the sequence has to live
+ * on the cards themselves or the left-to-right argument is lost entirely.
+ */
+function StepBadge({ n }: { n: string }) {
+  return (
+    <span className="mr-1.5 font-mono text-[10px] font-semibold text-[var(--brand)]">{n}</span>
+  );
+}
+
 /** Numbered stage marker over each column, so the flow reads left to right. */
 function StepRail({ language }: { language: Language }) {
   const steps: { n: string; label: string; span: string }[] = [
@@ -521,6 +562,7 @@ export function SinglePageView() {
             <Card className="lg:col-span-4">
               <CardHeader className="py-2.5">
                 <CardTitle className="font-display text-base font-medium">
+                  <StepBadge n="01" />
                   {t('inherentRisk', language)}
                   <LearnHint topicId="risk-basics" label={t('learnMoreAbout', language)} />
                 </CardTitle>
@@ -586,6 +628,7 @@ export function SinglePageView() {
             <Card className="lg:col-span-2 lg:self-start">
               <CardHeader className="px-3 py-2.5">
                 <CardTitle className="font-display text-sm font-medium">
+                  <StepBadge n="02" />
                   {t('inherentMatrix', language)}
                   <LearnHint topicId="matrix" label={t('learnMoreAbout', language)} />
                 </CardTitle>
@@ -600,6 +643,7 @@ export function SinglePageView() {
             <Card className="lg:col-span-4">
               <CardHeader className="py-2.5">
                 <CardTitle className="font-display text-base font-medium">
+                  <StepBadge n="03" />
                   {t('controls', language)}
                   <LearnHint topicId="scoring" label={t('learnMoreAbout', language)} />
                 </CardTitle>
@@ -681,6 +725,7 @@ export function SinglePageView() {
             <Card className="lg:col-span-2 lg:self-start">
               <CardHeader className="px-3 py-2.5">
                 <CardTitle className="font-display text-sm font-medium">
+                  <StepBadge n="04" />
                   {t('residualMatrix', language)}
                   <LearnHint topicId="scoring" label={t('learnMoreAbout', language)} />
                 </CardTitle>

@@ -363,16 +363,20 @@ export const translations = {
     en: 'Risk Standards & Frameworks',
   },
   learnSubtitle: {
-    'zh-TW': '本工具每一項評分要求，都對應一套公開標準。以下說明其出處、用法與限制。',
-    en: 'Every judgement this tool asks you to make comes from a published standard. Here is where each one comes from, how to use it, and where it stops working.',
+    'zh-TW': '本工具的分類軸取自公開標準；計分公式與風險等級門檻則是本課程的約定，並非任何標準的規定。以下說明各自的出處、用法與限制。',
+    en: 'The classification axes come from published standards; the scoring formula and the risk bands are conventions of this course, not requirements of any standard. Here is where each comes from, how to use it, and where it stops working.',
   },
   furtherReading: {
     'zh-TW': '參考資料',
     en: 'References',
   },
   freeToRead: {
-    'zh-TW': '免費閱讀',
-    en: 'Free',
+    'zh-TW': '全文免費',
+    en: 'Free full text',
+  },
+  abstractOnly: {
+    'zh-TW': '只有摘要',
+    en: 'Abstract only',
   },
   paidStandard: {
     'zh-TW': '須購買',
@@ -385,6 +389,10 @@ export const translations = {
   learnMoreAbout: {
     'zh-TW': '了解更多：',
     en: 'Learn about:',
+  },
+  educationCopyright: {
+    'zh-TW': '教學內容版權所有 © 2026 許君泰（Albert Hui）。所引用之標準，版權歸各出版機構所有。',
+    en: 'Teaching content © 2026 Albert Hui. All rights reserved. Cited standards remain the copyright of their respective publishers.',
   },
 
   // Taxonomy

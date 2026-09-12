@@ -82,11 +82,15 @@ export function getMatrixPosition(entry: ThreatEntry): { x: number; y: number } 
  */
 export function getResidualMatrixPosition(entry: ThreatEntry): { x: number; y: number } {
   const axisFactor = Math.sqrt(getControlFactor(entry));
-  const inherent = getMatrixPosition(entry);
+
+  // Scale the UNROUNDED impact mean and round once. Rounding to the grid first and
+  // then scaling rounds twice and moves more threats into a cell whose shade
+  // disagrees with their printed level.
+  const meanImpact = calculateImpactSum(entry) / 3;
 
   return {
-    x: clampToGrid(inherent.x * axisFactor),
-    y: clampToGrid(inherent.y * axisFactor),
+    x: clampToGrid(meanImpact * axisFactor),
+    y: clampToGrid(entry.probability * axisFactor),
   };
 }
 

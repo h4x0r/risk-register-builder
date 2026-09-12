@@ -14,8 +14,10 @@ export function AppHeader() {
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center justify-between px-4">
-        <div className="flex items-center gap-3">
+      {/* h-auto with wrapping: at 390px the fixed height forced the title on top of
+          the logos. The bar is allowed to grow instead of overlapping. */}
+      <div className="container flex min-h-14 flex-wrap items-center justify-between gap-y-2 px-4 py-2">
+        <div className="flex min-w-0 items-center gap-3">
           <a
             href="https://www.hkios.hk/"
             target="_blank"
@@ -47,8 +49,8 @@ export function AppHeader() {
               priority
             />
           </a>
-          <span className="text-muted-foreground mx-2">|</span>
-          <h1 className="text-lg font-semibold">{t('appTitle', language)}</h1>
+          <span className="text-muted-foreground mx-1 hidden sm:inline">|</span>
+          <h1 className="hidden truncate text-lg font-semibold sm:block">{t('appTitle', language)}</h1>
         </div>
         <div className="flex items-center gap-3">
           <Button

@@ -95,20 +95,20 @@ describe('the matrix and the score tell the same story', () => {
     }
   });
 
-  it('lands an entry in a residual cell whose shade matches its own risk level', () => {
-    // This is the invariant that makes the two matrices comparable: the residual
-    // cell a dot occupies is shaded the same level the register prints for it.
-    const cases: ThreatEntry[] = [
-      entry({ probability: 5, impactLife: 5, impactAsset: 5, impactBusiness: 5, controlInternal: 5, controlExternal: 5 }),
-      entry({ probability: 1, impactLife: 1, impactAsset: 1, impactBusiness: 1, controlInternal: 1, controlExternal: 1 }),
-      entry({ probability: 4, impactLife: 4, impactAsset: 4, impactBusiness: 4, controlInternal: 5, controlExternal: 5 }),
-    ];
-    for (const e of cases) {
-      const pos = getResidualMatrixPosition(e);
-      expect(getCellRiskLevel(pos.x, pos.y), `entry p${e.probability} c${e.controlInternal}`).toBe(
-        calculateRiskLevel(e)
-      );
-    }
+  it('does NOT guarantee the residual cell shade matches the printed level', () => {
+    // Rounding a continuous residual score onto a 5x5 grid loses information, so
+    // these can disagree — measured at about one combination in six, see
+    // invariant-probe.test.ts. The dot's own colour always carries the true level,
+    // which is what makes the picture safe to read; the cell tint is a property of
+    // the position, not of the threat.
+    const disagreeing = entry({
+      probability: 1, impactLife: 1, impactAsset: 1, impactBusiness: 5,
+      controlInternal: 5, controlExternal: 5,
+    });
+    const pos = getResidualMatrixPosition(disagreeing);
+
+    expect(calculateRiskLevel(disagreeing)).toBe('medium');
+    expect(getCellRiskLevel(pos.x, pos.y)).toBe('low');
   });
 
   it('keeps the inherent cell consistent with the uncontrolled score', () => {

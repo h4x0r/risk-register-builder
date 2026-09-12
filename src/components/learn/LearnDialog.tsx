@@ -8,7 +8,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { LEARN_TOPICS, getLearnTopic, Bilingual, LearnTopic } from '@/lib/education';
+import { LEARN_TOPICS, getLearnTopic, Bilingual, LearnTopic, CitationAccess } from '@/lib/education';
+import { MathText } from '@/components/learn/MathText';
 import { useRiskRegister } from '@/hooks/useRiskRegister';
 import { t } from '@/lib/i18n';
 import { Language } from '@/types';
@@ -38,6 +39,22 @@ function pick(value: Bilingual, language: Language): string {
   return language === 'zh-TW' ? value.zh : value.en;
 }
 
+/**
+ * Three access states, not two. "Abstract only" earns its own colour because a
+ * student who clicks expecting a paper and gets a title card has been misled.
+ */
+const ACCESS_STYLE: Record<CitationAccess, string> = {
+  free: 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200',
+  abstract: 'bg-sky-100 text-sky-900 dark:bg-sky-950 dark:text-sky-200',
+  paid: 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200',
+};
+
+const ACCESS_LABEL: Record<CitationAccess, 'freeToRead' | 'abstractOnly' | 'paidStandard'> = {
+  free: 'freeToRead',
+  abstract: 'abstractOnly',
+  paid: 'paidStandard',
+};
+
 function TopicBody({ topic, language }: { topic: LearnTopic; language: Language }) {
   return (
     <article className="space-y-4">
@@ -51,13 +68,13 @@ function TopicBody({ topic, language }: { topic: LearnTopic; language: Language 
           )}
         </div>
         <p className="border-l-2 border-primary bg-muted/50 py-2 pl-3 text-sm font-medium">
-          {pick(topic.summary, language)}
+          <MathText>{pick(topic.summary, language)}</MathText>
         </p>
       </header>
 
       {topic.paragraphs.map((paragraph, i) => (
         <p key={i} className="text-sm leading-relaxed text-foreground/90">
-          {pick(paragraph, language)}
+          <MathText>{pick(paragraph, language)}</MathText>
         </p>
       ))}
 
@@ -78,7 +95,7 @@ function TopicBody({ topic, language }: { topic: LearnTopic; language: Language 
                 <tr key={r} className="border-b">
                   {row.map((cell, c) => (
                     <td key={c} className={cn('p-2 align-top', c === 0 && 'font-medium whitespace-nowrap')}>
-                      {pick(cell, language)}
+                      <MathText>{pick(cell, language)}</MathText>
                     </td>
                   ))}
                 </tr>
@@ -105,14 +122,9 @@ function TopicBody({ topic, language }: { topic: LearnTopic; language: Language 
               </a>
               <span className="text-muted-foreground"> — {pick(cite.title, language)}</span>
               <span
-                className={cn(
-                  'ml-2 rounded px-1.5 py-0.5 text-[10px] font-medium',
-                  cite.free
-                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200'
-                    : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200'
-                )}
+                className={cn('ml-2 rounded px-1.5 py-0.5 text-[10px] font-medium', ACCESS_STYLE[cite.access])}
               >
-                {cite.free ? t('freeToRead', language) : t('paidStandard', language)}
+                {t(ACCESS_LABEL[cite.access], language)}
               </span>
             </li>
           ))}
@@ -166,6 +178,9 @@ export function LearnDialog() {
 
           <div className="min-h-0 overflow-y-auto px-6 py-5">
             <TopicBody topic={topic} language={language} />
+            <p className="mt-6 border-t pt-3 text-[10px] leading-relaxed text-muted-foreground">
+              {t('educationCopyright', language)}
+            </p>
           </div>
         </div>
       </DialogContent>
