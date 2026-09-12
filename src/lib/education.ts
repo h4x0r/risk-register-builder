@@ -198,6 +198,21 @@ const CITE = {
     url: 'https://www.pcpd.org.hk/english/data_privacy_law/6_data_protection_principles/principles.html',
     access: 'free',
   },
+  nistAle: {
+    ref: 'NIST CSRC Glossary',
+    title: { zh: '「年度損失預期」（ALE）詞條', en: 'Annualized Loss Expectancy (ALE)' },
+    url: 'https://csrc.nist.gov/glossary/term/annualized_loss_expectancy',
+    access: 'free',
+  },
+  nistir8286a: {
+    ref: 'NISTIR 8286A',
+    title: {
+      zh: '識別與估算網絡安全風險以支援企業風險管理',
+      en: 'Identifying and Estimating Cybersecurity Risk for Enterprise Risk Management',
+    },
+    url: 'https://csrc.nist.gov/pubs/ir/8286/a/final',
+    access: 'free',
+  },
   cvss: {
     ref: 'FIRST — CVSS v4.0',
     title: { zh: '通用漏洞評分系統規格文件', en: 'Common Vulnerability Scoring System v4.0 Specification' },
@@ -285,20 +300,8 @@ export const LEARN_TOPICS: LearnTopic[] = [
         en: 'So do not write $\\text{Risk} = \\text{Likelihood} \\times \\text{Impact} \\times \\text{Asset Value}$. Impact already is the measure of loss to the asset; multiplying by asset value as well counts the same thing twice and systematically inflates anything valuable. Use Likelihood × Impact, or use Threat × Vulnerability × Asset Value — one or the other.',
       },
       {
-        zh: '話雖如此，「教科書常常略過資產價值」這個批評是對的，而且重要。不知道甚麼東西受威脅，就無從判斷影響：同一場火災，燒毀的是備用文具櫃還是主要機房，風險完全不同。ISO/IEC 27005 把資產識別列為風險識別的起點，正是這個原因。資產價值不是額外的乘數，而是「影響」這個數字的來源 —— 略過它，評分就只是憑感覺。',
-        en: 'That said, the complaint that textbooks skip asset value is right, and it matters. Without knowing what is exposed there is no basis for scoring impact: the same fire in a spare stationery cupboard and in the main server room are not the same risk. ISO/IEC 27005 makes asset identification the starting point of risk identification for exactly this reason. Asset value is not an extra multiplier — it is where the impact number comes from. Skip it and the score is just a feeling.',
-      },
-      {
-        zh: '把資產價值認真當一回事，自然會走到經典的量化模型。先定義單一事件的損失：$$\\text{SLE} = \\text{AV} \\times \\text{EF}$$ 其中 AV 是資產價值，EF 是暴露係數 —— 一次事件會損失該資產價值的百分之幾（全毀為 1.0，燒毀一半為 0.5）。SLE 即單一損失預期。',
-        en: 'Taking asset value seriously leads straight to the classic quantitative model. First, the loss from one event: $$\\text{SLE} = \\text{AV} \\times \\text{EF}$$ where AV is asset value and EF is the exposure factor — the fraction of that value destroyed in a single event (1.0 for a total loss, 0.5 if half of it goes). SLE is the Single Loss Expectancy.',
-      },
-      {
-        zh: '再把它年度化：$$\\text{ALE} = \\text{SLE} \\times \\text{ARO}$$ ARO 是年度發生率（每年預期發生多少次；每五年一次即 0.2）。ALE 是年度損失預期 —— 即「若甚麼都不做，這項風險平均每年花費多少」。它之所以有用，是因為輸出的是金額：把 ALE 與一項控制措施的年度成本並排，就能直接回答「這筆錢值不值得花」。控制成本高於它所削減的 ALE，這項控制在經濟上就說不通。',
-        en: 'Then annualise it: $$\\text{ALE} = \\text{SLE} \\times \\text{ARO}$$ where ARO is the Annualised Rate of Occurrence — how many times a year you expect it (0.2 for once every five years). ALE is the Annualised Loss Expectancy: what this risk costs per year on average if you do nothing. Its usefulness is that the output is money, so putting ALE beside the annual cost of a control answers "is this worth buying" directly. A control costing more than the ALE it removes does not pay for itself.',
-      },
-      {
-        zh: '注意這裡資產價值是公式裡明明白白的一項（AV），這正是前面那個論點的最強版本：略過資產價值，SLE 根本無從計算。同時要留意 ALE 的三項限制。其一，EF 與 ARO 通常都是估算 —— 精確的算式套上粗糙的輸入，結果不會因為有小數點而變得可靠。其二，ALE 是期望值，會抹平尾部風險：一宗每年發生、損失 \\$10,000 的事件，與一宗百年一遇、損失 \\$1,000,000 的事件，ALE 同樣是 \\$10,000，但對機構存亡的意義截然不同。其三，它只計算可以換算成金額的損失。FAIR 的出現，某程度上正是為了以分布取代單一數字，回應前兩項問題。',
-        en: 'Note that asset value appears in the formula by name (AV). That is the strongest form of the earlier argument: skip asset value and there is no SLE to compute. Three limits travel with ALE. First, EF and ARO are usually estimates — a precise formula over rough inputs does not become reliable because the answer has decimal places. Second, ALE is an expected value and flattens tail risk: an event costing \\$10,000 every year and one costing \\$1,000,000 once a century both give an ALE of \\$10,000, and they are not the same thing to an organisation\'s survival. Third, it only counts losses that convert to money. FAIR exists partly to answer the first two by working in distributions rather than single numbers.',
+        zh: '話雖如此，「教科書常常略過資產價值」這個批評是對的，而且重要。不知道甚麼東西受威脅，就無從判斷影響：同一場火災，燒毀的是備用文具櫃還是主要機房，風險完全不同。ISO/IEC 27005 把資產識別列為風險識別的起點，正是這個原因。資產價值不是額外的乘數，而是「影響」這個數字的來源 —— 略過它，評分就只是憑感覺。把這一點推到底，就得到以金額表達的經典量化模型，見下一節。',
+        en: 'That said, the complaint that textbooks skip asset value is right, and it matters. Without knowing what is exposed there is no basis for scoring impact: the same fire in a spare stationery cupboard and in the main server room are not the same risk. ISO/IEC 27005 makes asset identification the starting point of risk identification for exactly this reason. Asset value is not an extra multiplier — it is where the impact number comes from. Skip it and the score is just a feeling. Push that all the way and you arrive at the classic model expressed in money, which is the next topic.',
       },
       {
         zh: '本工具處於哪個位置：「發生機率」是把威脅與脆弱性合併後的可能性；三個影響維度（人命、財產、業務）代表資產價值在不同方面的表現；「控制能力」則對應抵抗強度。本工具沒有獨立的資產清單 —— 這是一項實質限制：評分時請先明確寫下你心中所指的資產是甚麼，並把它記錄在評分理由欄，否則同一個分數在不同人心中可能指向不同的東西。',
@@ -350,6 +353,62 @@ export const LEARN_TOPICS: LearnTopic[] = [
       ],
     },
     citations: [CITE.iso27005_2022, CITE.openGroupRisk, CITE.fairLoss, CITE.nistGlossaryRisk],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: 'quantify',
+    title: { zh: '以金額表達風險：ALE', en: 'Putting a Number on It: ALE' },
+    standard: 'NISTIR 8286A',
+    summary: {
+      zh: '$\\text{ALE} = \\text{SLE} \\times \\text{ARO}$ 把風險換算成「每年多少錢」，因此可以直接與控制措施的成本比較。',
+      en: '$\\text{ALE} = \\text{SLE} \\times \\text{ARO}$ turns a risk into an amount per year, which is what makes it directly comparable with the cost of a control.',
+    },
+    paragraphs: [
+      {
+        zh: '把資產價值認真當一回事，自然會走到經典的量化模型。先定義單一事件的損失：$$\\text{SLE} = \\text{AV} \\times \\text{EF}$$ 其中 AV 是資產價值，EF 是暴露係數 —— 一次事件會損失該資產價值的百分之幾（全毀為 1.0，燒毀一半為 0.5）。SLE 即單一損失預期。',
+        en: 'Taking asset value seriously leads straight to the classic quantitative model. First, the loss from one event: $$\\text{SLE} = \\text{AV} \\times \\text{EF}$$ where AV is asset value and EF is the exposure factor — the fraction of that value destroyed in a single event (1.0 for a total loss, 0.5 if half of it goes). SLE is the Single Loss Expectancy.',
+      },
+      {
+        zh: '再把它年度化：$$\\text{ALE} = \\text{SLE} \\times \\text{ARO}$$ ARO 是年度發生率（每年預期發生多少次；每五年一次即 0.2）。ALE 是年度損失預期 —— 即「若甚麼都不做，這項風險平均每年花費多少」。它之所以有用，是因為輸出的是金額：把 ALE 與一項控制措施的年度成本並排，就能直接回答「這筆錢值不值得花」。控制成本高於它所削減的 ALE，這項控制在經濟上就說不通。',
+        en: 'Then annualise it: $$\\text{ALE} = \\text{SLE} \\times \\text{ARO}$$ where ARO is the Annualised Rate of Occurrence — how many times a year you expect it (0.2 for once every five years). ALE is the Annualised Loss Expectancy: what this risk costs per year on average if you do nothing. Its usefulness is that the output is money, so putting ALE beside the annual cost of a control answers "is this worth buying" directly. A control costing more than the ALE it removes does not pay for itself.',
+      },
+      {
+        zh: '注意這裡資產價值是公式裡明明白白的一項（AV），這正是前面那個論點的最強版本：略過資產價值，SLE 根本無從計算。同時要留意 ALE 的三項限制。其一，EF 與 ARO 通常都是估算 —— 精確的算式套上粗糙的輸入，結果不會因為有小數點而變得可靠。其二，ALE 是期望值，會抹平尾部風險：一宗每年發生、損失 \\$10,000 的事件，與一宗百年一遇、損失 \\$1,000,000 的事件，ALE 同樣是 \\$10,000，但對機構存亡的意義截然不同。其三，它只計算可以換算成金額的損失。FAIR 以分布取代單一數字，正是針對前兩項問題 —— 這是方法上的分別，下一節詳述。',
+        en: 'Note that asset value appears in the formula by name (AV). That is the strongest form of the earlier argument: skip asset value and there is no SLE to compute. Three limits travel with ALE. First, EF and ARO are usually estimates — a precise formula over rough inputs does not become reliable because the answer has decimal places. Second, ALE is an expected value and flattens tail risk: an event costing \\$10,000 every year and one costing \\$1,000,000 once a century both give an ALE of \\$10,000, and they are not the same thing to an organisation\'s survival. Third, it only counts losses that convert to money. FAIR addresses the first two by working in distributions rather than single numbers — a difference in method, taken up in the next topic.',
+      },
+    ],
+    citations: [CITE.nistAle, CITE.nistir8286a, CITE.fairWhat],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: 'fair',
+    title: { zh: 'FAIR 與量化風險分析', en: 'FAIR and Quantitative Risk Analysis' },
+    standard: 'The Open Group O-RA / O-RT',
+    summary: {
+      zh: 'FAIR 用金額與頻率表達風險。本工具用 1 至 5 的序數。兩者的結論不能互換。',
+      en: 'FAIR expresses risk in money and frequency. This tool uses 1–5 ordinals. The two do not produce interchangeable conclusions.',
+    },
+    paragraphs: [
+      {
+        zh: 'FAIR（Factor Analysis of Information Risk）是 The Open Group 的量化風險分析標準。它把風險拆解為：風險 = 損失事件頻率 × 損失量級；而損失事件頻率 = 威脅事件頻率 × 脆弱性。各項因子以分布（而非單一數字）表達，再以模擬求出結果。',
+        en: 'FAIR (Factor Analysis of Information Risk) is The Open Group\'s standard for quantitative risk analysis. It decomposes risk as: Risk = Loss Event Frequency × Loss Magnitude, where Loss Event Frequency = Threat Event Frequency × Vulnerability. The factors are expressed as distributions rather than single numbers and resolved by simulation.',
+      },
+      {
+        zh: '損失量級再細分為六種損失形式：生產力、應變、重置、競爭優勢、罰款與判決、聲譽。這份清單本身就是很好的檢查表 —— 它會逼你問「除了修復成本，還會失去甚麼？」',
+        en: 'Loss Magnitude is further split into six Forms of Loss: Productivity, Response, Replacement, Competitive Advantage, Fines & Judgements, and Reputation. That list is a useful checklist in its own right — it forces the question "besides the repair bill, what else is lost?"',
+      },
+      {
+        zh: '必須說清楚：本工具並非 FAIR 的實作。它借用 FAIR 的詞彙與結構，但這只是鬆散的類比，不是因子對應：發生機率是一個等級，不是「每年若干次」的頻率；FAIR 的抵抗強度是針對特定威脅能力而言，而本工具的「內部／外部資源」是一個籠統的整體評估，可能同時影響事件頻率與損失量級。實際計算的，是 1 至 5 序數的乘積。序數不是頻率，序數的乘積也不是金額。把本工具的分數當作損失估算來引用，是一種過度解讀。',
+        en: 'To be explicit: this tool is not an implementation of FAIR. It borrows FAIR\'s vocabulary and structure, but as loose analogy rather than factor correspondence: a probability band is not a frequency of events per year, and FAIR\'s Resistance Strength is defined against a specified threat capability, whereas "internal/external resources" here is one aggregate judgement that may bear on event frequency and loss magnitude alike. What it computes is a product of 1–5 ordinals. Ordinals are not frequencies, and their products are not currency. Quoting a score from this tool as a loss estimate is an overstatement.',
+      },
+      {
+        zh: '順帶一提本工具的一項已知不足：現有三個影響維度（人命、財產、業務）並未覆蓋 FAIR 的「罰款與判決」及「聲譽」。對資訊保安風險而言這是實質缺口 —— 一宗《私隱條例》違規事件的損失，往往主要落在監管與聲譽上。',
+        en: 'A known gap in this tool follows from that list: its three impact dimensions (life, asset, business) do not cover FAIR\'s Fines & Judgements or Reputation. For information security risk that is a real omission — the loss from a privacy breach often sits mostly in the regulatory and reputational columns.',
+      },
+    ],
+    citations: [CITE.fairWhat, CITE.fairLoss, CITE.openGroupRisk],
   },
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -597,36 +656,6 @@ export const LEARN_TOPICS: LearnTopic[] = [
       ],
     },
     citations: [CITE.strideMs, CITE.strideSdl, CITE.owaspTm],
-  },
-
-  // ─────────────────────────────────────────────────────────────────────────
-  {
-    id: 'fair',
-    title: { zh: 'FAIR 與量化風險分析', en: 'FAIR and Quantitative Risk Analysis' },
-    standard: 'The Open Group O-RA / O-RT',
-    summary: {
-      zh: 'FAIR 用金額與頻率表達風險。本工具用 1 至 5 的序數。兩者的結論不能互換。',
-      en: 'FAIR expresses risk in money and frequency. This tool uses 1–5 ordinals. The two do not produce interchangeable conclusions.',
-    },
-    paragraphs: [
-      {
-        zh: 'FAIR（Factor Analysis of Information Risk）是 The Open Group 的量化風險分析標準。它把風險拆解為：風險 = 損失事件頻率 × 損失量級；而損失事件頻率 = 威脅事件頻率 × 脆弱性。各項因子以分布（而非單一數字）表達，再以模擬求出結果。',
-        en: 'FAIR (Factor Analysis of Information Risk) is The Open Group\'s standard for quantitative risk analysis. It decomposes risk as: Risk = Loss Event Frequency × Loss Magnitude, where Loss Event Frequency = Threat Event Frequency × Vulnerability. The factors are expressed as distributions rather than single numbers and resolved by simulation.',
-      },
-      {
-        zh: '損失量級再細分為六種損失形式：生產力、應變、重置、競爭優勢、罰款與判決、聲譽。這份清單本身就是很好的檢查表 —— 它會逼你問「除了修復成本，還會失去甚麼？」',
-        en: 'Loss Magnitude is further split into six Forms of Loss: Productivity, Response, Replacement, Competitive Advantage, Fines & Judgements, and Reputation. That list is a useful checklist in its own right — it forces the question "besides the repair bill, what else is lost?"',
-      },
-      {
-        zh: '必須說清楚：本工具並非 FAIR 的實作。它借用 FAIR 的詞彙與結構，但這只是鬆散的類比，不是因子對應：發生機率是一個等級，不是「每年若干次」的頻率；FAIR 的抵抗強度是針對特定威脅能力而言，而本工具的「內部／外部資源」是一個籠統的整體評估，可能同時影響事件頻率與損失量級。實際計算的，是 1 至 5 序數的乘積。序數不是頻率，序數的乘積也不是金額。把本工具的分數當作損失估算來引用，是一種過度解讀。',
-        en: 'To be explicit: this tool is not an implementation of FAIR. It borrows FAIR\'s vocabulary and structure, but as loose analogy rather than factor correspondence: a probability band is not a frequency of events per year, and FAIR\'s Resistance Strength is defined against a specified threat capability, whereas "internal/external resources" here is one aggregate judgement that may bear on event frequency and loss magnitude alike. What it computes is a product of 1–5 ordinals. Ordinals are not frequencies, and their products are not currency. Quoting a score from this tool as a loss estimate is an overstatement.',
-      },
-      {
-        zh: '順帶一提本工具的一項已知不足：現有三個影響維度（人命、財產、業務）並未覆蓋 FAIR 的「罰款與判決」及「聲譽」。對資訊保安風險而言這是實質缺口 —— 一宗《私隱條例》違規事件的損失，往往主要落在監管與聲譽上。',
-        en: 'A known gap in this tool follows from that list: its three impact dimensions (life, asset, business) do not cover FAIR\'s Fines & Judgements or Reputation. For information security risk that is a real omission — the loss from a privacy breach often sits mostly in the regulatory and reputational columns.',
-      },
-    ],
-    citations: [CITE.fairWhat, CITE.fairLoss, CITE.openGroupRisk],
   },
 
   // ─────────────────────────────────────────────────────────────────────────

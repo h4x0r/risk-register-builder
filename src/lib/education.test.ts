@@ -34,6 +34,40 @@ describe('learning content integrity', () => {
     expect(getLearnTopic('no-such-topic')).toBeUndefined();
   });
 
+  it('keeps the quantitative thread consecutive, since topics cross-refer to "the next topic"', () => {
+    // equations ends by pointing at ALE, and ALE ends by pointing at FAIR. Reordering
+    // the array without these staying adjacent turns those sentences into lies —
+    // which is exactly what happened once.
+    const order = LEARN_TOPIC_IDS;
+    expect(order.indexOf('quantify')).toBe(order.indexOf('equations') + 1);
+    expect(order.indexOf('fair')).toBe(order.indexOf('quantify') + 1);
+  });
+
+  it('keeps ALE out of the FAIR topic', () => {
+    // ALE is not part of FAIR. Filing it there would teach the conflation this
+    // content spends its time correcting.
+    const fair = getLearnTopic('fair')!;
+    const fairText = fair.paragraphs.map((p) => p.en).join(' ');
+    expect(fairText).not.toContain('Annualised Loss Expectancy');
+    expect(fairText).not.toContain('ARO');
+
+    const quantify = getLearnTopic('quantify')!;
+    expect(quantify.paragraphs.map((p) => p.en).join(' ')).toContain('Annualised Loss Expectancy');
+  });
+
+  it('does not cite SP 800-30 for ALE, which does not appear in it', () => {
+    // Checked against the Rev. 1 PDF with a passing control: "annualized loss
+    // expectancy" and "single loss expectancy" are both absent. NIST defines ALE in
+    // the NISTIR 8286 series instead.
+    const quantify = getLearnTopic('quantify')!;
+    for (const cite of quantify.citations) {
+      expect(cite.url, `${cite.ref} must not be SP 800-30`).not.toContain('800-30');
+      expect(cite.url).not.toContain('800/30');
+    }
+    expect(quantify.citations.some((c) => c.url.includes('8286') || c.url.includes('annualized_loss')))
+      .toBe(true);
+  });
+
   it('covers every taxonomy axis the app asks a student to use', () => {
     // If the UI asks for a judgement, the app owes the student an explanation of it.
     for (const id of ['categories', 'sources', 'ppt', 'stride', 'scoring', 'matrix']) {
