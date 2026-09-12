@@ -59,7 +59,7 @@ test('a STRIDE chip on a threat opens the STRIDE lesson', async ({ page }) => {
   await page.locator('input[placeholder*="Search"], input[placeholder*="搜尋"]').fill('Ransomware');
   await page.getByRole('combobox').nth(1).click();
   await page.getByRole('option', { name: /Ransomware/ }).click();
-  await page.getByRole('button', { name: '+ Add' }).first().click();
+  await page.getByRole('button', { name: /^Add$/ }).first().click();
   await page.waitForTimeout(400);
 
   // Ransomware is tagged T and D; clicking one goes straight to the lesson.

@@ -3,6 +3,7 @@
 import { ThreatEntry, Language, RiskLevel } from '@/types';
 import { calculateRiskLevel, getRiskLevelLabel, getMatrixPosition } from '@/lib/calculations';
 import { taxonomyLabels } from '@/lib/taxonomy';
+import { t } from '@/lib/i18n';
 
 /**
  * Threat names and mitigation text are user-authored and land in an HTML template,
@@ -50,6 +51,13 @@ export async function exportToPdf(entries: ThreatEntry[], language: Language): P
         .date { text-align: center; color: #666; margin-bottom: 30px; }
         .taxonomy { font-size: 11px; color: #555; }
         .footnote { margin-top: 24px; font-size: 10px; color: #777; line-height: 1.5; }
+        .notice { margin-top: 28px; padding: 14px 16px; border: 1px solid #d8d2c8;
+                  border-left: 4px solid #C57B06; background: #fbf8f3;
+                  font-size: 11px; line-height: 1.6; color: #443f38;
+                  page-break-inside: avoid; }
+        .notice h3 { margin: 0 0 8px; font-size: 12px; color: #222; }
+        .notice p { margin: 0 0 8px; }
+        .notice p:last-child { margin-bottom: 0; }
         @media print { body { padding: 20px; } }
       </style>
     </head>
@@ -154,6 +162,14 @@ export async function exportToPdf(entries: ThreatEntry[], language: Language): P
           ? '評分方法：本工具採用 1 至 5 級序數評分進行風險篩選與排序，並非 FAIR（Factor Analysis of Information Risk）的量化分析。評分結果適用於相對排序，不可解讀為損失頻率或金額的估算。'
           : 'Scoring method — This register uses 1–5 ordinal screening scores for triage and relative ranking. It is informed by the FAIR ontology but is not a FAIR quantitative analysis: the figures support relative ranking and must not be read as estimates of loss frequency or monetary magnitude.'}
       </p>
+
+      <section class="notice">
+        <h3>${escapeHtml(t('disclaimerTitle', language))}</h3>
+        <p><strong>${escapeHtml(t('disclaimerShort', language))}</strong></p>
+        <p>${escapeHtml(t('disclaimerBody', language))}</p>
+        <p>${escapeHtml(t('disclaimerResponsibility', language))}</p>
+        <p>${escapeHtml(t('disclaimerData', language))}</p>
+      </section>
     </body>
     </html>
   `;

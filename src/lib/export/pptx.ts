@@ -3,6 +3,7 @@
 import PptxGenJS from 'pptxgenjs';
 import { ThreatEntry, Language } from '@/types';
 import { calculateRiskLevel, getRiskLevelLabel, getMatrixPosition } from '@/lib/calculations';
+import { t } from '@/lib/i18n';
 
 export async function exportToPptx(entries: ThreatEntry[], language: Language): Promise<void> {
   const pptx = new PptxGenJS();
@@ -138,6 +139,26 @@ export async function exportToPptx(entries: ThreatEntry[], language: Language): 
     border: { type: 'solid', pt: 0.5, color: '999999' },
     valign: 'middle',
   });
+
+  // Closing slide: the notice. A deck is the artefact most likely to be forwarded
+  // to someone who never saw the tool, so it carries its own limits.
+  const notice = pptx.addSlide();
+  notice.addText(t('disclaimerTitle', language), {
+    x: 0.5, y: 0.4, w: 9, h: 0.5, fontSize: 20, bold: true, color: '222222',
+  });
+  notice.addText(t('disclaimerShort', language), {
+    x: 0.5, y: 1.0, w: 9, h: 0.4, fontSize: 13, bold: true, color: 'C57B06',
+  });
+  notice.addText(
+    [
+      { text: t('disclaimerBody', language), options: { breakLine: true } },
+      { text: '', options: { breakLine: true } },
+      { text: t('disclaimerResponsibility', language), options: { breakLine: true } },
+      { text: '', options: { breakLine: true } },
+      { text: t('disclaimerData', language) },
+    ],
+    { x: 0.5, y: 1.6, w: 9, h: 3.4, fontSize: 11, color: '444444', valign: 'top' }
+  );
 
   // Download
   await pptx.writeFile({ fileName: `risk-register-${new Date().toISOString().split('T')[0]}.pptx` });

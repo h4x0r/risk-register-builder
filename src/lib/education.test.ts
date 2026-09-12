@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { LEARN_TOPICS, LEARN_TOPIC_IDS, getLearnTopic, Bilingual } from './education';
 import { CATEGORY_ORDER, STRIDE_LABELS, RISK_THRESHOLDS, DEFAULT_ENTRY_VALUES } from './constants';
-import { calculateInherentThreat, calculateResidualRisk } from './calculations';
+import { calculateInherentThreat, calculateResidualRisk, getResidualMatrixPosition } from './calculations';
 import { ThreatEntry } from '@/types';
 
 /** Every bilingual string in a topic, flattened, with a path for the failure message. */
@@ -144,6 +144,20 @@ describe('the scoring lesson matches the code it describes', () => {
     expect(min).toBe(3);
     expect(max).toBe(75);
     expect(text.en).toContain('3–75');
+  });
+
+  it('is right that the residual matrix bottoms out in the corner cell', () => {
+    // The matrix lesson states this as a limit of the picture. If the positioning
+    // ever changes so it is no longer true, the lesson has to stop saying it.
+    const pos = getResidualMatrixPosition(
+      entry({ probability: 5, impactLife: 5, impactAsset: 5, impactBusiness: 5, controlInternal: 1, controlExternal: 1 })
+    );
+    expect(pos).toEqual({ x: 1, y: 1 });
+
+    const matrix = getLearnTopic('matrix')!;
+    const text = matrix.paragraphs.map((p) => p.en).join(' ');
+    expect(text).toContain('bottom-left cell');
+    expect(text).toContain('√f');
   });
 
   it('is right that strongest controls drive residual risk to zero', () => {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ChevronDown, ChevronRight, Plus, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,11 +13,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useRiskRegister, createCustomEntry } from '@/hooks/useRiskRegister';
-import { RiskMatrix } from '@/components/risk-matrix/RiskMatrix';
+import { RiskMatrix, RiskMatrixLegend } from '@/components/risk-matrix/RiskMatrix';
 import {
   THREAT_PRESETS,
   CATEGORY_ORDER,
-  CATEGORY_LABELS,
   SOURCE_LABELS,
   PILLAR_LABELS,
   STRIDE_LABELS,
@@ -26,24 +26,78 @@ import {
 } from '@/lib/constants';
 import { searchPresets, presetsForCategory, categoryLabel } from '@/lib/taxonomy';
 import { LearnLink } from '@/components/learn/LearnDialog';
-import { calculateRiskLevel, getRiskLevelLabel, getRiskLevelColor, getMatrixPosition } from '@/lib/calculations';
-import { t } from '@/lib/i18n';
-import { Language, ThreatCategory, ThreatEntry, ThreatSource } from '@/types';
+import {
+  calculateRiskLevel,
+  getRiskLevelLabel,
+  getMatrixPosition,
+  getResidualMatrixPosition,
+  calculateInherentThreat,
+  calculateResidualRisk,
+} from '@/lib/calculations';
+import { t, TranslationKey } from '@/lib/i18n';
+import {
+  Language,
+  RatingKey,
+  RATING_KEYS,
+  ThreatCategory,
+  ThreatEntry,
+  ThreatSource,
+  RiskLevel,
+} from '@/types';
 import { cn } from '@/lib/utils';
 
-function CompactRating({ value, onChange, reversed }: { value: number; onChange: (v: number) => void; reversed?: boolean }) {
+const RISK_VAR: Record<RiskLevel, string> = {
+  low: 'var(--risk-low)',
+  medium: 'var(--risk-medium)',
+  high: 'var(--risk-high)',
+};
+
+const SOURCE_STYLES: Record<ThreatSource, string> = {
+  adversarial: 'bg-red-100 text-red-900 dark:bg-red-950 dark:text-red-200',
+  accidental: 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200',
+  structural: 'bg-blue-100 text-blue-900 dark:bg-blue-950 dark:text-blue-200',
+  environmental: 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200',
+};
+
+/** Label for each scored judgement, reused by the table head and the rationale drawer. */
+const RATING_LABEL: Record<RatingKey, TranslationKey> = {
+  probability: 'probability',
+  impactLife: 'lifeSafety',
+  impactAsset: 'assetSafety',
+  impactBusiness: 'businessOps',
+  controlInternal: 'internalResources',
+  controlExternal: 'externalResources',
+};
+
+function RatingScale({
+  value,
+  onChange,
+  reversed,
+  label,
+}: {
+  value: number;
+  onChange: (v: number) => void;
+  reversed?: boolean;
+  label: string;
+}) {
   const values = reversed ? [5, 4, 3, 2, 1] : [1, 2, 3, 4, 5];
+
   return (
-    <div className="flex gap-1">
+    <div role="radiogroup" aria-label={label} className="flex gap-[3px]">
       {values.map((v) => (
         <button
           key={v}
+          type="button"
+          role="radio"
+          aria-checked={value === v}
+          aria-label={`${label} ${v}`}
           onClick={() => onChange(v)}
           className={cn(
-            'h-6 w-6 rounded-full text-xs font-medium transition-all active:scale-95',
+            'h-6 w-6 rounded-[3px] font-mono text-[11px] transition-all',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
             value === v
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-muted hover:bg-muted-foreground/30'
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'bg-muted text-muted-foreground hover:bg-accent'
           )}
         >
           {v}
@@ -53,27 +107,11 @@ function CompactRating({ value, onChange, reversed }: { value: number; onChange:
   );
 }
 
-/** NIST SP 800-30 threat source, colour-coded so the register scans at a glance. */
-const SOURCE_STYLES: Record<ThreatSource, string> = {
-  adversarial: 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200',
-  accidental: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200',
-  structural: 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-200',
-  environmental: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200',
-};
-
-/**
- * The taxonomy tags for one entry, rendered under its name.
- *
- * Native `title` tooltips rather than the Radix tooltip: these are glosses on an
- * abbreviation, not interactive content, and they must survive print and PDF export.
- */
 function TaxonomyChips({ entry, language }: { entry: ThreatEntry; language: Language }) {
   const pick = (l: { zh: string; en: string }) => (language === 'zh-TW' ? l.zh : l.en);
 
   if (!entry.source && !entry.pillars?.length && !entry.stride?.length) return null;
 
-  // Every chip is a way into the lesson behind it, so the explanation sits one click
-  // from the judgement rather than in a manual nobody opens.
   return (
     <div className="mt-1 flex flex-wrap items-center gap-1">
       {entry.source && (
@@ -103,7 +141,7 @@ function TaxonomyChips({ entry, language }: { entry: ThreatEntry; language: Lang
           key={cls}
           topicId="stride"
           title={`STRIDE — ${pick(STRIDE_LABELS[cls])} · ${t('securityProperty', language)}: ${pick(PROPERTY_LABELS[STRIDE_PROPERTY[cls]])}`}
-          className="rounded border border-purple-300 bg-purple-50 px-1 py-0.5 font-mono text-[10px] font-bold text-purple-800 transition-opacity hover:opacity-75 dark:border-purple-800 dark:bg-purple-950 dark:text-purple-200"
+          className="rounded border border-purple-300 bg-purple-50 px-1 py-0.5 font-mono text-[10px] font-bold text-purple-900 transition-opacity hover:opacity-75 dark:border-purple-800 dark:bg-purple-950 dark:text-purple-200"
         >
           {STRIDE_LABELS[cls].short}
         </LearnLink>
@@ -112,7 +150,6 @@ function TaxonomyChips({ entry, language }: { entry: ThreatEntry; language: Lang
   );
 }
 
-/** A "why" affordance beside a section heading. */
 function LearnHint({ topicId, label }: { topicId: string; label: string }) {
   return (
     <LearnLink
@@ -125,14 +162,87 @@ function LearnHint({ topicId, label }: { topicId: string; label: string }) {
   );
 }
 
+/** How many of the six judgements carry a recorded reason. */
+function rationaleCount(entry: ThreatEntry): number {
+  return RATING_KEYS.filter((key) => (entry.rationale?.[key] ?? '').trim().length > 0).length;
+}
+
+function RationaleDrawer({
+  entry,
+  language,
+  onChange,
+}: {
+  entry: ThreatEntry;
+  language: Language;
+  onChange: (key: RatingKey, value: string) => void;
+}) {
+  return (
+    <div className="space-y-3 rounded-[4px] border border-dashed bg-muted/40 p-3">
+      <p className="text-[11px] leading-relaxed text-muted-foreground">
+        {t('rationaleHint', language)}
+      </p>
+      <div className="grid gap-2.5 sm:grid-cols-2">
+        {RATING_KEYS.map((key) => (
+          <label key={key} className="block">
+            <span className="mb-1 flex items-baseline justify-between text-[11px] font-medium">
+              {t(RATING_LABEL[key], language)}
+              <span className="font-mono text-[10px] text-muted-foreground">
+                {entry[key] as number}
+              </span>
+            </span>
+            <textarea
+              value={entry.rationale?.[key] ?? ''}
+              onChange={(e) => onChange(key, e.target.value)}
+              rows={2}
+              placeholder={t('rationalePlaceholder', language)}
+              className={cn(
+                'w-full resize-y rounded-[3px] border bg-card px-2 py-1.5 text-xs leading-relaxed',
+                'placeholder:text-muted-foreground/60',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+              )}
+            />
+          </label>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Numbered stage marker over each column, so the flow reads left to right. */
+function StepRail({ language }: { language: Language }) {
+  const steps: { n: string; label: string; span: string }[] = [
+    { n: '01', label: t('inherentRisk', language), span: 'col-span-4' },
+    { n: '02', label: t('inherentMatrix', language), span: 'col-span-2' },
+    { n: '03', label: t('controls', language), span: 'col-span-4' },
+    { n: '04', label: t('residualMatrix', language), span: 'col-span-2' },
+  ];
+
+  return (
+    <ol className="hidden grid-cols-12 gap-3 lg:grid" aria-hidden="true">
+      {steps.map((step, i) => (
+        <li key={step.n} className={cn('flex items-center gap-2', step.span)}>
+          <span className="font-mono text-[10px] font-semibold text-[var(--brand)]">{step.n}</span>
+          <span className="truncate text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+            {step.label}
+          </span>
+          <span className="h-px flex-1 bg-border" />
+          {i < steps.length - 1 && (
+            <ChevronRight className="h-3 w-3 shrink-0 text-muted-foreground/50" />
+          )}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 export function SinglePageView() {
   const { entries, language, addEntry, updateEntry, removeEntry } = useRiskRegister();
   const [selectedCategory, setSelectedCategory] = useState<ThreatCategory>('natural');
   const [selectedPreset, setSelectedPreset] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [customName, setCustomName] = useState('');
+  const [expanded, setExpanded] = useState<string | null>(null);
 
-  // A free-text query searches the whole library; otherwise the category scopes it.
   const searching = searchQuery.trim().length > 0;
   const presets = searching ? searchPresets(searchQuery) : presetsForCategory(selectedCategory);
 
@@ -161,14 +271,23 @@ export function SinglePageView() {
     setCustomName('');
   };
 
+  const setRationale = (entry: ThreatEntry, key: RatingKey, value: string) => {
+    const next = { ...(entry.rationale ?? {}) };
+    if (value.trim()) next[key] = value;
+    else delete next[key];
+    updateEntry(entry.id, { rationale: Object.keys(next).length ? next : undefined });
+  };
+
+  const nameOf = (entry: ThreatEntry) =>
+    language === 'zh-TW' ? entry.name : entry.nameEn || entry.name;
+
+  const empty = entries.length === 0;
+
   return (
     <div className="space-y-4">
-      {/* Add Threat Section */}
+      {/* ── Add a threat ─────────────────────────────────────────────── */}
       <Card>
-        <CardHeader className="py-3">
-          <CardTitle className="text-base">{t('addThreat', language)}</CardTitle>
-        </CardHeader>
-        <CardContent className="py-2">
+        <CardContent className="py-3">
           <div className="flex flex-wrap items-center gap-2">
             <Select
               value={selectedCategory}
@@ -179,28 +298,36 @@ export function SinglePageView() {
               }}
               disabled={searching}
             >
-              <SelectTrigger className="w-56">
+              <SelectTrigger className="w-56" aria-label={t('category', language)}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {CATEGORY_ORDER.map((cat) => (
                   <SelectItem key={cat} value={cat}>
-                    {language === 'zh-TW' ? CATEGORY_LABELS[cat].zh : CATEGORY_LABELS[cat].en}
+                    {categoryLabel(cat, language)}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Input
-              placeholder={t('searchThreats', language)}
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setSelectedPreset('');
-              }}
-              className="w-44"
-            />
+
+            <div className="relative">
+              <Search
+                className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground"
+                aria-hidden="true"
+              />
+              <Input
+                placeholder={t('searchThreats', language)}
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setSelectedPreset('');
+                }}
+                className="w-48 pl-7"
+              />
+            </div>
+
             <Select value={selectedPreset} onValueChange={setSelectedPreset}>
-              <SelectTrigger className="w-64">
+              <SelectTrigger className="w-64" aria-label={t('threat', language)}>
                 <SelectValue
                   placeholder={
                     searching && presets.length === 0
@@ -219,285 +346,327 @@ export function SinglePageView() {
                     {language === 'zh-TW' ? preset.nameZh : preset.nameEn}
                     {searching && (
                       <span className="ml-2 text-xs text-muted-foreground">
-                        {language === 'zh-TW'
-                          ? CATEGORY_LABELS[preset.category].zh
-                          : CATEGORY_LABELS[preset.category].en}
+                        {categoryLabel(preset.category, language)}
                       </span>
                     )}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+
             <Button onClick={handleAddPreset} disabled={!selectedPreset} size="sm">
-              + {t('add', language)}
+              <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+              {t('add', language)}
             </Button>
-            <span className="text-muted-foreground self-center">{t('or', language)}</span>
+
+            <span className="text-xs text-muted-foreground">{t('or', language)}</span>
+
             <Input
               placeholder={language === 'zh-TW' ? '自訂威脅名稱' : 'Custom threat name'}
               value={customName}
               onChange={(e) => setCustomName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleAddCustom()}
               className="w-44"
             />
-            <Button onClick={handleAddCustom} disabled={!customName.trim()} size="sm">
-              + {t('add', language)}
+            <Button onClick={handleAddCustom} disabled={!customName.trim()} size="sm" variant="secondary">
+              <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+              {t('add', language)}
             </Button>
-            <span className="ml-auto self-center text-xs text-muted-foreground">
+
+            <span className="ml-auto font-mono text-[11px] text-muted-foreground">
               {searching
-                ? `${t('searchResults', language)}: ${presets.length}`
-                : `${THREAT_PRESETS.length} ${language === 'zh-TW' ? '項威脅' : 'threats'}`}
+                ? `${t('searchResults', language)} ${presets.length}`
+                : `${THREAT_PRESETS.length} ${language === 'zh-TW' ? '項' : 'presets'}`}
             </span>
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 lg:grid-cols-12">
-        {/* Inherent Risk: Threat, Probability, Impact */}
-        <Card className="lg:col-span-6">
-          <CardHeader className="py-3">
-            <CardTitle className="text-base">
-              {language === 'zh-TW' ? '固有風險' : 'Inherent Risk'}
-              <LearnHint topicId="risk-basics" label={t('learnMoreAbout', language)} />
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="py-2">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b">
-                    <th className="p-2 text-left font-medium border-r" rowSpan={3}>{t('threat', language)}</th>
-                    <th className="p-2 text-center font-medium border-r">{t('probability', language)}</th>
-                    <th className="p-2 text-center font-medium" colSpan={3}>{t('impact', language)}</th>
-                  </tr>
-                  <tr className="border-b text-xs text-muted-foreground">
-                    <th className="p-1 border-r"></th>
-                    <th className="p-1">{language === 'zh-TW' ? '生命' : 'Life'}</th>
-                    <th className="p-1">{language === 'zh-TW' ? '財產' : 'Asset'}</th>
-                    <th className="p-1">{language === 'zh-TW' ? '業務' : 'Biz'}</th>
-                  </tr>
-                  <tr className="border-b text-xs text-muted-foreground">
-                    <th className="p-1 border-r">
-                      <div className="flex justify-between">
-                        <span>{t('low', language)}</span>
-                        <span>←→</span>
-                        <span>{t('high', language)}</span>
+      {empty ? (
+        <Card>
+          <CardContent className="py-12 text-center text-sm text-muted-foreground">
+            {t('noEntriesYet', language)}
+          </CardContent>
+        </Card>
+      ) : (
+        /* Everything inside this node is what the PNG export captures. */
+        <div id="risk-capture-root" className="space-y-3 bg-background">
+          <StepRail language={language} />
+
+          {/* items-start so each card ends where its content ends. Stretching them to
+              a common height leaves large empty bordered boxes beside the tallest. */}
+          <div className="grid gap-3 lg:grid-cols-12 lg:items-start">
+            {/* ── 01 Inherent inputs ───────────────────────────────── */}
+            <Card className="lg:col-span-4">
+              <CardHeader className="py-2.5">
+                <CardTitle className="font-display text-base font-medium">
+                  {t('inherentRisk', language)}
+                  <LearnHint topicId="risk-basics" label={t('learnMoreAbout', language)} />
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 py-2">
+                {entries.map((entry) => {
+                  const open = expanded === entry.id;
+                  const filled = rationaleCount(entry);
+
+                  return (
+                    <div key={entry.id} data-testid={`inherent-row-${entry.id}`} className="border-b pb-2 last:border-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium">{nameOf(entry)}</div>
+                          <TaxonomyChips entry={entry} language={language} />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setExpanded(open ? null : entry.id)}
+                          aria-expanded={open}
+                          title={open ? t('hideRationale', language) : t('showRationale', language)}
+                          className={cn(
+                            'no-print flex shrink-0 items-center gap-1 rounded px-1.5 py-0.5 font-mono text-[10px] transition-colors',
+                            filled === RATING_KEYS.length
+                              ? 'text-[var(--risk-low)]'
+                              : filled > 0
+                                ? 'text-[var(--risk-medium)]'
+                                : 'text-muted-foreground',
+                            'hover:bg-muted'
+                          )}
+                        >
+                          {filled}/{RATING_KEYS.length}
+                          <ChevronDown
+                            className={cn('h-3 w-3 transition-transform', open && 'rotate-180')}
+                            aria-hidden="true"
+                          />
+                        </button>
                       </div>
-                    </th>
-                    <th className="p-1">
-                      <div className="flex justify-between">
-                        <span>{t('low', language)}</span>
-                        <span>→</span>
-                        <span>{t('high', language)}</span>
-                      </div>
-                    </th>
-                    <th className="p-1">
-                      <div className="flex justify-between">
-                        <span>{t('low', language)}</span>
-                        <span>→</span>
-                        <span>{t('high', language)}</span>
-                      </div>
-                    </th>
-                    <th className="p-1">
-                      <div className="flex justify-between">
-                        <span>{t('low', language)}</span>
-                        <span>→</span>
-                        <span>{t('high', language)}</span>
-                      </div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {entries.map((entry) => (
-                    <tr key={entry.id} className="border-b">
-                      <td className="p-2 font-medium border-r align-top">
-                        {language === 'zh-TW' ? entry.name : (entry.nameEn || entry.name)}
-                        <TaxonomyChips entry={entry} language={language} />
-                      </td>
-                      <td className="p-2 border-r">
-                        <CompactRating
+
+                      <div className="mt-2 grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1.5">
+                        <span className="text-[11px] text-muted-foreground">
+                          {t('probability', language)}
+                        </span>
+                        <RatingScale
+                          label={`${nameOf(entry)} ${t('probability', language)}`}
                           value={entry.probability}
                           onChange={(v) => updateEntry(entry.id, { probability: v })}
                         />
-                      </td>
-                      <td className="p-2">
-                        <CompactRating
-                          value={entry.impactLife}
-                          onChange={(v) => updateEntry(entry.id, { impactLife: v })}
-                        />
-                      </td>
-                      <td className="p-2">
-                        <CompactRating
-                          value={entry.impactAsset}
-                          onChange={(v) => updateEntry(entry.id, { impactAsset: v })}
-                        />
-                      </td>
-                      <td className="p-2">
-                        <CompactRating
-                          value={entry.impactBusiness}
-                          onChange={(v) => updateEntry(entry.id, { impactBusiness: v })}
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Risk Matrix (Center) */}
-        <Card className="lg:col-span-3">
-          <CardHeader className="py-3 px-3">
-            <CardTitle className="text-base">
-              {t('riskMatrix', language)}
-              <LearnHint topicId="matrix" label={t('learnMoreAbout', language)} />
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="px-2 py-2">
-            <RiskMatrix entries={entries} />
-          </CardContent>
-        </Card>
-
-        {/* Residual Risk: Control, Risk Level */}
-        <Card className="lg:col-span-3">
-          <CardHeader className="py-3">
-            <CardTitle className="text-base">
-              {language === 'zh-TW' ? '剩餘風險' : 'Residual Risk'}
-              <LearnHint topicId="scoring" label={t('learnMoreAbout', language)} />
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="py-2">
-            <div className="space-y-2">
-              {/* Header */}
-              <div className="flex items-center gap-2 text-xs text-muted-foreground border-b pb-2">
-                <div className="flex-1 text-center">
-                  <div className="font-medium text-foreground text-sm">{t('controlCapability', language)}</div>
-                  <div className="flex justify-between mt-1">
-                    <span>{t('weak', language)}</span>
-                    <span>→</span>
-                    <span>{t('strong', language)}</span>
-                  </div>
-                </div>
-                <div className="w-12 text-center font-medium text-foreground text-sm">{t('riskLevel', language)}</div>
-                <div className="w-6"></div>
-              </div>
-              {/* Entries */}
-              {entries.map((entry) => {
-                const riskLevel = calculateRiskLevel(entry);
-                return (
-                  <div key={entry.id} className="flex items-center gap-2 border-b pb-2">
-                    <div className="flex-1 space-y-1">
-                      <div className="flex items-center gap-1">
-                        <span className="text-xs text-muted-foreground w-8">{language === 'zh-TW' ? '外部' : 'Ext'}</span>
-                        <CompactRating
-                          value={entry.controlExternal}
-                          onChange={(v) => updateEntry(entry.id, { controlExternal: v })}
-                          reversed
-                        />
+                        {(['impactLife', 'impactAsset', 'impactBusiness'] as const).map((key) => (
+                          <FragmentRow
+                            key={key}
+                            label={t(RATING_LABEL[key], language)}
+                            value={entry[key]}
+                            onChange={(v) => updateEntry(entry.id, { [key]: v })}
+                            name={nameOf(entry)}
+                          />
+                        ))}
                       </div>
-                      <div className="flex items-center gap-1">
-                        <span className="text-xs text-muted-foreground w-8">{language === 'zh-TW' ? '內部' : 'Int'}</span>
-                        <CompactRating
-                          value={entry.controlInternal}
-                          onChange={(v) => updateEntry(entry.id, { controlInternal: v })}
-                          reversed
-                        />
-                      </div>
-                    </div>
-                    <div className="w-12 text-center">
-                      <span
-                        className={cn(
-                          'inline-block rounded px-2 py-0.5 text-xs font-medium text-white',
-                          getRiskLevelColor(riskLevel)
-                        )}
-                      >
-                        {getRiskLevelLabel(riskLevel, language)}
-                      </span>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
-                      onClick={() => removeEntry(entry.id)}
-                    >
-                      ×
-                    </Button>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
-      {/* Risk Register Table */}
-      <Card>
-        <CardHeader className="py-3">
-          <CardTitle className="text-base">
-            {t('riskRegister', language)}
-            <LearnHint topicId="treatment" label={t('learnMoreAbout', language)} />
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="py-2">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b">
-                  <th className="p-2 text-left font-medium">{t('threat', language)}</th>
-                  <th className="p-2 text-left font-medium">
-                    {t('category', language)}
-                    <LearnHint topicId="categories" label={t('learnMoreAbout', language)} />
-                  </th>
-                  <th className="p-2 text-left font-medium">{t('vulnerability', language)}</th>
-                  <th className="p-2 text-left font-medium">{t('impact', language)}</th>
-                  <th className="p-2 text-center font-medium">{t('riskLevel', language)}</th>
-                  <th className="p-2 text-left font-medium">{t('mitigationStrategy', language)}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {entries.map((entry) => {
-                  const riskLevel = calculateRiskLevel(entry);
-                  const matrixPos = getMatrixPosition(entry);
-                  return (
-                    <tr key={entry.id} className="border-b">
-                      <td className="p-2 font-medium align-top">
-                        {language === 'zh-TW' ? entry.name : (entry.nameEn || entry.name)}
-                        <TaxonomyChips entry={entry} language={language} />
-                      </td>
-                      <td className="p-2 align-top text-xs text-muted-foreground">
-                        {categoryLabel(entry.category, language)}
-                      </td>
-                      <td className="p-2 text-center font-medium">
-                        {matrixPos.y}
-                      </td>
-                      <td className="p-2 text-center font-medium">
-                        {matrixPos.x}
-                      </td>
-                      <td className="p-2 text-center">
-                        <span
-                          className={cn(
-                            'inline-block rounded px-2 py-0.5 text-xs font-medium text-white',
-                            getRiskLevelColor(riskLevel)
-                          )}
-                        >
-                          {getRiskLevelLabel(riskLevel, language)}
-                        </span>
-                      </td>
-                      <td className="p-2">
-                        <Input
-                          value={entry.mitigationStrategy}
-                          onChange={(e) => updateEntry(entry.id, { mitigationStrategy: e.target.value })}
-                          className="h-8 text-sm"
-                          placeholder="-"
-                        />
-                      </td>
-                    </tr>
+                      {open && (
+                        <div className="mt-2.5">
+                          <RationaleDrawer
+                            entry={entry}
+                            language={language}
+                            onChange={(key, value) => setRationale(entry, key, value)}
+                          />
+                        </div>
+                      )}
+                    </div>
                   );
                 })}
-              </tbody>
-            </table>
+              </CardContent>
+            </Card>
+
+            {/* ── 02 Inherent matrix ───────────────────────────────── */}
+            <Card className="lg:col-span-2 lg:self-start">
+              <CardHeader className="px-3 py-2.5">
+                <CardTitle className="font-display text-sm font-medium">
+                  {t('inherentMatrix', language)}
+                  <LearnHint topicId="matrix" label={t('learnMoreAbout', language)} />
+                </CardTitle>
+                <p className="text-[10px] text-muted-foreground">{t('beforeControls', language)}</p>
+              </CardHeader>
+              <CardContent className="px-3 pb-3 pt-0">
+                <RiskMatrix mode="inherent" entries={entries} />
+              </CardContent>
+            </Card>
+
+            {/* ── 03 Controls ──────────────────────────────────────── */}
+            <Card className="lg:col-span-4">
+              <CardHeader className="py-2.5">
+                <CardTitle className="font-display text-base font-medium">
+                  {t('controls', language)}
+                  <LearnHint topicId="scoring" label={t('learnMoreAbout', language)} />
+                </CardTitle>
+                <p className="text-[10px] text-muted-foreground">
+                  {t('weak', language)} 5 ← → 1 {t('strong', language)}
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-2 py-2">
+                {entries.map((entry) => {
+                  const level = calculateRiskLevel(entry);
+                  return (
+                    <div key={entry.id} className="flex items-center gap-2 border-b pb-2 last:border-0">
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="truncate text-xs font-medium">{nameOf(entry)}</div>
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                          {(['controlInternal', 'controlExternal'] as const).map((key) => (
+                            <span key={key} className="flex items-center gap-1.5">
+                              <span className="w-8 text-[10px] text-muted-foreground">
+                                {t(RATING_LABEL[key], language).slice(0, 2)}
+                              </span>
+                              <RatingScale
+                                label={`${nameOf(entry)} ${t(RATING_LABEL[key], language)}`}
+                                value={entry[key]}
+                                reversed
+                                onChange={(v) => updateEntry(entry.id, { [key]: v })}
+                              />
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="shrink-0 text-right">
+                        <div className="font-mono text-[10px] tabular text-muted-foreground">
+                          {calculateInherentThreat(entry).toFixed(0)} →{' '}
+                          {calculateResidualRisk(entry).toFixed(1)}
+                        </div>
+                        <span
+                          className="mt-0.5 inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold text-white"
+                          style={{ background: RISK_VAR[level] }}
+                        >
+                          {getRiskLevelLabel(level, language)}
+                        </span>
+                      </div>
+
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="no-print h-6 w-6 shrink-0 p-0 text-muted-foreground hover:text-[var(--risk-high)]"
+                        aria-label={`${t('delete', language)} ${nameOf(entry)}`}
+                        onClick={() => removeEntry(entry.id)}
+                      >
+                        <X className="h-3.5 w-3.5" aria-hidden="true" />
+                      </Button>
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+
+            {/* ── 04 Residual matrix ───────────────────────────────── */}
+            <Card className="lg:col-span-2 lg:self-start">
+              <CardHeader className="px-3 py-2.5">
+                <CardTitle className="font-display text-sm font-medium">
+                  {t('residualMatrix', language)}
+                  <LearnHint topicId="scoring" label={t('learnMoreAbout', language)} />
+                </CardTitle>
+                <p className="text-[10px] text-muted-foreground">{t('afterControls', language)}</p>
+              </CardHeader>
+              <CardContent className="px-3 pb-3 pt-0">
+                <RiskMatrix mode="residual" entries={entries} />
+              </CardContent>
+            </Card>
           </div>
-        </CardContent>
-      </Card>
+
+          <RiskMatrixLegend className="justify-end px-1" />
+
+          {/* ── Register ──────────────────────────────────────────── */}
+          <Card>
+            <CardHeader className="py-2.5">
+              <CardTitle className="font-display text-base font-medium">
+                {t('riskRegister', language)}
+                <LearnHint topicId="treatment" label={t('learnMoreAbout', language)} />
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="py-2">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm" data-testid="risk-register-table">
+                  <thead>
+                    <tr className="border-b text-[11px] uppercase tracking-wider text-muted-foreground">
+                      <th className="p-2 text-left font-medium">{t('threat', language)}</th>
+                      <th className="p-2 text-left font-medium">
+                        {t('category', language)}
+                        <LearnHint topicId="categories" label={t('learnMoreAbout', language)} />
+                      </th>
+                      <th className="p-2 text-center font-medium">{t('inherentRisk', language)}</th>
+                      <th className="p-2 text-center font-medium">{t('residualRisk', language)}</th>
+                      <th className="p-2 text-center font-medium">{t('riskLevel', language)}</th>
+                      <th className="p-2 text-left font-medium">{t('mitigationStrategy', language)}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {entries.map((entry) => {
+                      const level = calculateRiskLevel(entry);
+                      const inherentPos = getMatrixPosition(entry);
+                      const residualPos = getResidualMatrixPosition(entry);
+                      return (
+                        <tr key={entry.id} className="border-b align-top">
+                          <td className="p-2 font-medium">
+                            {nameOf(entry)}
+                            <TaxonomyChips entry={entry} language={language} />
+                          </td>
+                          <td className="p-2 text-xs text-muted-foreground">
+                            {categoryLabel(entry.category, language)}
+                          </td>
+                          <td className="p-2 text-center font-mono text-xs tabular">
+                            {inherentPos.x}×{inherentPos.y}
+                            <span className="ml-1 opacity-60">
+                              {calculateInherentThreat(entry).toFixed(0)}
+                            </span>
+                          </td>
+                          <td className="p-2 text-center font-mono text-xs tabular">
+                            {residualPos.x}×{residualPos.y}
+                            <span className="ml-1 opacity-60">
+                              {calculateResidualRisk(entry).toFixed(1)}
+                            </span>
+                          </td>
+                          <td className="p-2 text-center">
+                            <span
+                              className="inline-block rounded px-2 py-0.5 text-[11px] font-semibold text-white"
+                              style={{ background: RISK_VAR[level] }}
+                            >
+                              {getRiskLevelLabel(level, language)}
+                            </span>
+                          </td>
+                          <td className="p-2">
+                            <Input
+                              value={entry.mitigationStrategy}
+                              onChange={(e) =>
+                                updateEntry(entry.id, { mitigationStrategy: e.target.value })
+                              }
+                              className="h-8 text-sm"
+                              placeholder="—"
+                              aria-label={`${t('mitigationStrategy', language)} ${nameOf(entry)}`}
+                            />
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
+  );
+}
+
+/** One labelled rating row inside the inherent card's two-column grid. */
+function FragmentRow({
+  label,
+  value,
+  onChange,
+  name,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+  name: string;
+}) {
+  return (
+    <>
+      <span className="text-[11px] text-muted-foreground">{label}</span>
+      <RatingScale label={`${name} ${label}`} value={value} onChange={onChange} />
+    </>
   );
 }

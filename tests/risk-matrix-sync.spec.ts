@@ -1,79 +1,46 @@
 import { test, expect } from '@playwright/test';
 
-test('risk register shows matrix coordinates that update with ratings', async ({ page }) => {
+/**
+ * The register prints matrix coordinates for each threat. They must track the
+ * ratings, or the table and the two matrices tell different stories about the same
+ * threat — which is the failure this whole screen exists to avoid.
+ */
+test('register coordinates follow the ratings', async ({ page }) => {
   await page.goto('/');
-
-  // Clear localStorage to start fresh
   await page.evaluate(() => localStorage.clear());
   await page.reload();
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(900);
 
-  // Add a custom threat
-  const customInput = page.locator('input[placeholder*="自訂"], input[placeholder*="Custom"]');
-  await customInput.fill('Test Threat');
-  const addButtons = page.locator('button:has-text("+ ")');
-  await addButtons.last().click();
-  await page.waitForTimeout(500);
+  await page.locator('input[placeholder*="自訂"], input[placeholder*="Custom"]').fill('Test Threat');
+  await page.getByRole('button', { name: /Add|新增/ }).last().click();
+  await page.waitForTimeout(400);
 
-  await page.screenshot({ path: 'test-results/01-threat-added.png', fullPage: true });
+  const row = page.getByTestId('risk-register-table').locator('tbody tr').first();
+  const inherentCell = row.locator('td').nth(2);
+  const residualCell = row.locator('td').nth(3);
 
-  // Get the Risk Register table (second table on page)
-  const riskRegisterTable = page.locator('table').nth(1);
-  const riskRegisterRow = riskRegisterTable.locator('tbody tr').first();
-  const cells = riskRegisterRow.locator('td');
+  // Everything defaults to 3, so impact mean 3 against probability 3.
+  await expect(inherentCell).toContainText('3×3');
 
-  // Columns: 0 Threat | 1 Category | 2 Vulnerability | 3 Impact | 4 Risk | 5 Mitigation
-  const VULNERABILITY_COL = 2;
-  const IMPACT_COL = 3;
+  // Probability 5 moves the y axis only.
+  const inherent = page.locator('[data-testid^="inherent-row-"]').first();
+  await inherent.getByRole('radio', { name: /Probability 5$/ }).click();
+  await expect(inherentCell).toContainText('3×5');
 
-  // Initial values: all ratings at 3, so vulnerability=3, impact=3
-  const initialVulnerability = await cells.nth(VULNERABILITY_COL).textContent();
-  const initialImpact = await cells.nth(IMPACT_COL).textContent();
-  console.log('Initial - Vulnerability:', initialVulnerability, 'Impact:', initialImpact);
-  expect(initialVulnerability?.trim()).toBe('3');
-  expect(initialImpact?.trim()).toBe('3');
+  // Raising one impact to 5 rounds the mean (5+3+3)/3 = 3.67 up to 4.
+  await inherent.getByRole('radio', { name: /Life Safety 5$/ }).click();
+  await expect(inherentCell).toContainText('4×5');
 
-  // Change probability to 5 (first rating group, button index 4)
-  const vulnTable = page.locator('table').first();
-  const vulnRow = vulnTable.locator('tbody tr').first();
-  const ratingButtons = vulnRow.locator('button.rounded-full');
-  await ratingButtons.nth(4).click(); // probability = 5
-  await page.waitForTimeout(300);
+  // All three impacts at 5 gives a mean of 5.
+  await inherent.getByRole('radio', { name: /Asset Safety 5$/ }).click();
+  await inherent.getByRole('radio', { name: /Business Operations 5$/ }).click();
+  await expect(inherentCell).toContainText('5×5');
 
-  await page.screenshot({ path: 'test-results/02-after-prob-change.png', fullPage: true });
+  // Residual is a separate coordinate and must not silently equal inherent when
+  // controls are anything other than fully ineffective.
+  await expect(residualCell).not.toContainText('5×5');
 
-  // Vulnerability should now be 5 (Y-axis = probability)
-  const afterProbVuln = await cells.nth(VULNERABILITY_COL).textContent();
-  console.log('After prob change - Vulnerability:', afterProbVuln);
-  expect(afterProbVuln?.trim()).toBe('5');
-
-  // Change life impact to 5 (second rating group, button index 9)
-  await ratingButtons.nth(9).click(); // impactLife = 5
-  await page.waitForTimeout(300);
-
-  await page.screenshot({ path: 'test-results/03-after-impact-change.png', fullPage: true });
-
-  // Impact should now be 4 (X-axis = round((5+3+3)/3) = round(3.67) = 4)
-  const afterImpactValue = await cells.nth(IMPACT_COL).textContent();
-  console.log('After impact change - Impact:', afterImpactValue);
-  expect(afterImpactValue?.trim()).toBe('4');
-
-  // Change all impact values to 5 to verify impact becomes 5
-  await ratingButtons.nth(14).click(); // impactAsset = 5
-  await ratingButtons.nth(19).click(); // impactBusiness = 5
-  await page.waitForTimeout(300);
-
-  await page.screenshot({ path: 'test-results/04-all-impacts-5.png', fullPage: true });
-
-  // Impact should now be 5 (X-axis = round((5+5+5)/3) = 5)
-  const finalImpact = await cells.nth(IMPACT_COL).textContent();
-  console.log('Final - Impact:', finalImpact);
-  expect(finalImpact?.trim()).toBe('5');
-
-  // Verify matrix has dots (may have animation duplicates)
-  const dotsInMatrix = page.locator('.grid-cols-5 .rounded-full.absolute');
-  const dotCount = await dotsInMatrix.count();
-  expect(dotCount).toBeGreaterThanOrEqual(1);
-
-  await page.screenshot({ path: 'test-results/05-final.png', fullPage: true });
+  // Both matrices are on the page, each holding the one threat.
+  const dots = page.locator('.grid-cols-5 span.rounded-full');
+  expect(await dots.count()).toBeGreaterThanOrEqual(2);
 });

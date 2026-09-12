@@ -65,6 +65,34 @@ export type RiskLevel = 'low' | 'medium' | 'high';
 
 export type Language = 'zh-TW' | 'en';
 
+/** The six scored judgements. Each one can carry the reasoning behind it. */
+export type RatingKey =
+  | 'probability'
+  | 'impactLife'
+  | 'impactAsset'
+  | 'impactBusiness'
+  | 'controlInternal'
+  | 'controlExternal';
+
+export const RATING_KEYS: RatingKey[] = [
+  'probability',
+  'impactLife',
+  'impactAsset',
+  'impactBusiness',
+  'controlInternal',
+  'controlExternal',
+];
+
+/**
+ * Why each score was chosen.
+ *
+ * A number with no reasoning behind it cannot be reviewed, challenged or defended
+ * six months later, which is most of what a risk register is for. Stored sparsely:
+ * an unwritten rationale is absent rather than an empty string, which keeps share
+ * links short.
+ */
+export type Rationale = Partial<Record<RatingKey, string>>;
+
 export interface ThreatEntry {
   id: string;
   name: string;
@@ -84,6 +112,9 @@ export interface ThreatEntry {
   impactBusiness: number;        // 業務運作: 1=低, 5=高
   controlInternal: number;       // 內部資源: 1=強, 5=弱
   controlExternal: number;       // 外部資源: 1=強, 5=弱
+
+  // The reasoning behind each of the six scores above.
+  rationale?: Rationale;
 
   // Risk register fields
   mitigationStrategy: string;        // 緩解策略

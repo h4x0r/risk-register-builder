@@ -227,6 +227,120 @@ export const translations = {
     en: 'Custom',
   },
 
+  // Matrix & flow
+  inherentRisk: {
+    'zh-TW': '固有風險',
+    en: 'Inherent Risk',
+  },
+  residualRisk: {
+    'zh-TW': '剩餘風險',
+    en: 'Residual Risk',
+  },
+  controls: {
+    'zh-TW': '控制措施',
+    en: 'Controls',
+  },
+  inherentMatrix: {
+    'zh-TW': '固有風險矩陣',
+    en: 'Inherent Matrix',
+  },
+  residualMatrix: {
+    'zh-TW': '剩餘風險矩陣',
+    en: 'Residual Matrix',
+  },
+  beforeControls: {
+    'zh-TW': '施加控制措施之前',
+    en: 'Before controls',
+  },
+  afterControls: {
+    'zh-TW': '施加控制措施之後',
+    en: 'After controls',
+  },
+  emptyCell: {
+    'zh-TW': '此格沒有項目',
+    en: 'No threats in this cell',
+  },
+  noEntriesYet: {
+    'zh-TW': '尚未加入威脅。從上方選擇或自訂一項，即可開始評估。',
+    en: 'No threats yet. Pick one above, or add your own, to start the assessment.',
+  },
+
+  // Rationale
+  rationale: {
+    'zh-TW': '評分理由',
+    en: 'Rationale',
+  },
+  rationaleHint: {
+    'zh-TW': '記下選擇此評分的理由。沒有理由的分數無法覆核，亦難以在日後辯護。',
+    en: 'Record why you chose this score. A number with no reasoning behind it cannot be reviewed, challenged, or defended later.',
+  },
+  rationalePlaceholder: {
+    'zh-TW': '為何是這個分數？依據甚麼證據或假設？',
+    en: 'Why this score? On what evidence or assumption?',
+  },
+  rationaleRecorded: {
+    'zh-TW': '已記錄理由',
+    en: 'rationale recorded',
+  },
+  rationaleMissing: {
+    'zh-TW': '未填理由',
+    en: 'no rationale',
+  },
+  showRationale: {
+    'zh-TW': '展開評分理由',
+    en: 'Show rationale',
+  },
+  hideRationale: {
+    'zh-TW': '收起評分理由',
+    en: 'Hide rationale',
+  },
+
+  // Export
+  exportPng: {
+    'zh-TW': 'PNG 圖像 — 兩個矩陣及登記冊快照',
+    en: 'PNG image — both matrices and the register',
+  },
+  exportingPng: {
+    'zh-TW': '正在產生圖像…',
+    en: 'Rendering image…',
+  },
+
+  // Disclaimer
+  disclaimerShort: {
+    'zh-TW': '本工具只協助整理判斷，不會代為判斷。',
+    en: 'This tool organises your judgement. It does not supply it.',
+  },
+  disclaimerTitle: {
+    'zh-TW': '使用聲明及責任歸屬',
+    en: 'Scope of This Tool and Where Responsibility Sits',
+  },
+  disclaimerBody: {
+    'zh-TW':
+      '本工具是一項教學與整理輔助工具。所有威脅的選取、評分、控制能力評估及緩解決定，均由使用者作出，其準確性、完整性與適切性亦由使用者負責。工具所計算的分數為序數排序，用於分流與討論，並非風險的量度，亦不構成保安、法律、財務或監管方面的意見。',
+    en:
+      'This is a teaching and organising aid. Every threat selected, every score entered, every judgement of control capability and every mitigation decision is made by you, and their accuracy, completeness and suitability remain yours. The figures it computes are ordinal rankings for triage and discussion — they are not measurements of risk, and they are not security, legal, financial or regulatory advice.',
+  },
+  disclaimerResponsibility: {
+    'zh-TW':
+      '輸出結果應交由具備資格的人員覆核，並按貴機構的實際情況、風險準則及適用法規加以驗證後，方可用作任何決定的依據。使用者須就依據本工具輸出所作的一切決定及後果承擔全部責任。',
+    en:
+      'Output should be reviewed by a suitably qualified person and validated against your organisation\'s own circumstances, risk criteria and applicable law before it informs any decision. Responsibility for decisions taken on the basis of this output, and for their consequences, rests entirely with you.',
+  },
+  disclaimerData: {
+    'zh-TW':
+      '所有資料只儲存於你的瀏覽器本機，以及你自行產生的分享連結之內；本工具不會將資料傳送或儲存於伺服器。分享連結會把完整內容編碼於網址中，請按敏感程度自行斟酌傳閱對象。',
+    en:
+      'Your data stays in your own browser and in any share link you generate; nothing is transmitted to or stored on a server. A share link encodes the full contents in the URL, so treat it with the sensitivity the contents deserve.',
+  },
+  disclaimerAcknowledge: {
+    'zh-TW': '明白',
+    en: 'Understood',
+  },
+  readDisclaimer: {
+    'zh-TW': '閱讀完整聲明',
+    en: 'Read the full notice',
+  },
+
   // Learning
   learn: {
     'zh-TW': '學習',

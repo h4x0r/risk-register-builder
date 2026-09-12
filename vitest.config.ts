@@ -8,7 +8,9 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
-    exclude: ['**/node_modules/**', '**/tests/**', '**/*.spec.ts'],
+    // `.claude/worktrees/**` holds checkouts of this same repo, so without it every
+    // test file is collected twice and the reported total silently doubles.
+    exclude: ['**/node_modules/**', '**/tests/**', '**/*.spec.ts', '**/.claude/**'],
   },
   resolve: {
     alias: {

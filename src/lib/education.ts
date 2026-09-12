@@ -489,6 +489,18 @@ export const LEARN_TOPICS: LearnTopic[] = [
         zh: '這不是放棄矩陣的理由，而是使用它的條件：把矩陣視為溝通與分流的工具，而不是量度工具。當一項決定的代價足以令排序錯誤造成實質後果時，就應該改用量化方法（例如 FAIR），而不是把矩陣的格子再細分。',
         en: 'None of that is a reason to abandon the matrix; it is the condition for using one. Treat it as an instrument for communication and triage rather than measurement. When a decision is costly enough that a mis-ranking would matter, move to a quantitative method such as FAIR rather than subdividing the cells.',
       },
+      {
+        zh: '本工具並排顯示兩個矩陣：左邊為固有風險（未計入控制措施），右邊為剩餘風險（計入之後）。兩個矩陣使用同一個格子底色，因此唯一移動的是威脅本身 —— 那正是這一對圖要展示的比較。',
+        en: 'This tool shows two matrices side by side: inherent on the left, before controls are counted, and residual on the right, after. Both use the same cell shading, so the only thing that moves between them is the threat itself — which is the comparison the pair exists to make.',
+      },
+      {
+        zh: '剩餘位置如何計算，值得說明清楚。位於 (x, y) 的格子代表影響總和 3x 與發生機率 y，其分數為 3xy；而剩餘風險 = 固有風險 × f。因此把兩個座標軸各乘以 √f，即得 3(x√f)(y√f) = 3xy·f —— 威脅落入的格子，其分數正好等於它的剩餘風險分數。控制能力在本模型中只是一個整體強度，並未區分它是壓低發生機率還是減輕影響，因此把 f 平均分配到兩軸是唯一可用的做法；任何其他分配方式，都等於宣稱一項輸入從未記錄過的區別。',
+        en: 'How the residual position is derived is worth stating plainly. A cell at (x, y) stands for impact sum 3x against probability y, so it scores 3xy; and residual risk is inherent × f. Scaling both axes by √f therefore gives 3(x√f)(y√f) = 3xy·f — the cell a threat lands in scores exactly its residual risk. Splitting f evenly across the two axes is the only option available: this model records control capability as a single strength and never says whether a control suppresses likelihood or softens impact. Any other split would assert a distinction the inputs never captured.',
+      },
+      {
+        zh: '兩項限制須一併記住。其一，當控制能力評為最強時，f = 0，剩餘位置會落在最左下角的格子 —— 這與計分方法一節提到的「剩餘風險歸零」是同一個簡化，現實中並不成立。其二，格子是離散的，四捨五入會令細微的控制改善看不出移動；沒有移動不等於沒有改善。',
+        en: 'Two limits travel with it. First, at the strongest control setting f is 0 and the residual position lands in the bottom-left cell — the same simplification noted under the scoring method, and not something that happens in reality. Second, the grid is discrete, so rounding can leave a small genuine improvement showing no movement at all. A dot that has not moved is not proof that nothing changed.',
+      },
     ],
     citations: [CITE.cox2008, CITE.iso31000, CITE.fairWhat],
   },

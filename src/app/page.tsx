@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AppHeader } from '@/components/AppHeader';
 import { SinglePageView } from '@/components/expert/SinglePageView';
+import { DisclaimerFooter } from '@/components/common/Disclaimer';
 import { useRiskRegister } from '@/hooks/useRiskRegister';
 import { decodeEntries } from '@/lib/url-state';
 
@@ -37,11 +38,12 @@ function HomeContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative flex min-h-screen flex-col bg-background">
       <AppHeader />
-      <main className="container py-6">
+      <main className="container relative z-10 flex-1 px-4 py-5">
         <SinglePageView />
       </main>
+      <DisclaimerFooter />
     </div>
   );
 }

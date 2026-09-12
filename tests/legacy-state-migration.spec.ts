@@ -33,7 +33,7 @@ test('a returning user with pre-expansion localStorage state still gets a workin
   await page.waitForTimeout(1500);
 
   // The register must actually render its rows, not a blank error boundary.
-  const registerTable = page.locator('table').nth(1);
+  const registerTable = page.getByTestId('risk-register-table');
   await expect(registerTable.locator('tbody tr')).toHaveCount(2);
 
   // And the legacy categories must have been re-homed on the way in.
