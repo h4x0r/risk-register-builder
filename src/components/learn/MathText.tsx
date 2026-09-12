@@ -36,23 +36,38 @@ interface Segment {
   value: string;
 }
 
+/**
+ * A dollar sign that is currency, not a delimiter.
+ *
+ * Prose about money is unavoidable in a risk course — "$10,000 every year and one
+ * costing $1,000,000" was silently swallowed as a formula, eating the text between
+ * the two symbols. Writing `\$` in the content keeps it literal. The sentinel is a
+ * private-use codepoint, so it cannot occur in real content.
+ */
+const ESCAPED_DOLLAR = '';
+
 /** Split prose into text and math runs. `$$` wins over `$` so display math parses first. */
 export function parseMath(source: string): Segment[] {
+  const protectedSource = source.replace(/\\\$/g, ESCAPED_DOLLAR);
+  const restore = (value: string) => value.split(ESCAPED_DOLLAR).join('$');
+
   const segments: Segment[] = [];
   // Non-greedy so adjacent formulas do not merge into one run.
   const pattern = /\$\$([^$]+?)\$\$|\$([^$]+?)\$/g;
   let cursor = 0;
   let match: RegExpExecArray | null;
 
-  while ((match = pattern.exec(source)) !== null) {
+  while ((match = pattern.exec(protectedSource)) !== null) {
     if (match.index > cursor) {
-      segments.push({ kind: 'text', value: source.slice(cursor, match.index) });
+      segments.push({ kind: 'text', value: restore(protectedSource.slice(cursor, match.index)) });
     }
-    if (match[1] !== undefined) segments.push({ kind: 'display', value: match[1].trim() });
-    else segments.push({ kind: 'inline', value: match[2].trim() });
+    if (match[1] !== undefined) segments.push({ kind: 'display', value: restore(match[1].trim()) });
+    else segments.push({ kind: 'inline', value: restore(match[2].trim()) });
     cursor = match.index + match[0].length;
   }
-  if (cursor < source.length) segments.push({ kind: 'text', value: source.slice(cursor) });
+  if (cursor < protectedSource.length) {
+    segments.push({ kind: 'text', value: restore(protectedSource.slice(cursor)) });
+  }
 
   return segments;
 }

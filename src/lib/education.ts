@@ -289,6 +289,18 @@ export const LEARN_TOPICS: LearnTopic[] = [
         en: 'That said, the complaint that textbooks skip asset value is right, and it matters. Without knowing what is exposed there is no basis for scoring impact: the same fire in a spare stationery cupboard and in the main server room are not the same risk. ISO/IEC 27005 makes asset identification the starting point of risk identification for exactly this reason. Asset value is not an extra multiplier — it is where the impact number comes from. Skip it and the score is just a feeling.',
       },
       {
+        zh: '把資產價值認真當一回事，自然會走到經典的量化模型。先定義單一事件的損失：$$\\text{SLE} = \\text{AV} \\times \\text{EF}$$ 其中 AV 是資產價值，EF 是暴露係數 —— 一次事件會損失該資產價值的百分之幾（全毀為 1.0，燒毀一半為 0.5）。SLE 即單一損失預期。',
+        en: 'Taking asset value seriously leads straight to the classic quantitative model. First, the loss from one event: $$\\text{SLE} = \\text{AV} \\times \\text{EF}$$ where AV is asset value and EF is the exposure factor — the fraction of that value destroyed in a single event (1.0 for a total loss, 0.5 if half of it goes). SLE is the Single Loss Expectancy.',
+      },
+      {
+        zh: '再把它年度化：$$\\text{ALE} = \\text{SLE} \\times \\text{ARO}$$ ARO 是年度發生率（每年預期發生多少次；每五年一次即 0.2）。ALE 是年度損失預期 —— 即「若甚麼都不做，這項風險平均每年花費多少」。它之所以有用，是因為輸出的是金額：把 ALE 與一項控制措施的年度成本並排，就能直接回答「這筆錢值不值得花」。控制成本高於它所削減的 ALE，這項控制在經濟上就說不通。',
+        en: 'Then annualise it: $$\\text{ALE} = \\text{SLE} \\times \\text{ARO}$$ where ARO is the Annualised Rate of Occurrence — how many times a year you expect it (0.2 for once every five years). ALE is the Annualised Loss Expectancy: what this risk costs per year on average if you do nothing. Its usefulness is that the output is money, so putting ALE beside the annual cost of a control answers "is this worth buying" directly. A control costing more than the ALE it removes does not pay for itself.',
+      },
+      {
+        zh: '注意這裡資產價值是公式裡明明白白的一項（AV），這正是前面那個論點的最強版本：略過資產價值，SLE 根本無從計算。同時要留意 ALE 的三項限制。其一，EF 與 ARO 通常都是估算 —— 精確的算式套上粗糙的輸入，結果不會因為有小數點而變得可靠。其二，ALE 是期望值，會抹平尾部風險：一宗每年發生、損失 \\$10,000 的事件，與一宗百年一遇、損失 \\$1,000,000 的事件，ALE 同樣是 \\$10,000，但對機構存亡的意義截然不同。其三，它只計算可以換算成金額的損失。FAIR 的出現，某程度上正是為了以分布取代單一數字，回應前兩項問題。',
+        en: 'Note that asset value appears in the formula by name (AV). That is the strongest form of the earlier argument: skip asset value and there is no SLE to compute. Three limits travel with ALE. First, EF and ARO are usually estimates — a precise formula over rough inputs does not become reliable because the answer has decimal places. Second, ALE is an expected value and flattens tail risk: an event costing \\$10,000 every year and one costing \\$1,000,000 once a century both give an ALE of \\$10,000, and they are not the same thing to an organisation\'s survival. Third, it only counts losses that convert to money. FAIR exists partly to answer the first two by working in distributions rather than single numbers.',
+      },
+      {
         zh: '本工具處於哪個位置：「發生機率」是把威脅與脆弱性合併後的可能性；三個影響維度（人命、財產、業務）代表資產價值在不同方面的表現；「控制能力」則對應抵抗強度。本工具沒有獨立的資產清單 —— 這是一項實質限制：評分時請先明確寫下你心中所指的資產是甚麼，並把它記錄在評分理由欄，否則同一個分數在不同人心中可能指向不同的東西。',
         en: 'Where this tool sits: probability is likelihood with threat and vulnerability already merged; the three impact dimensions (life, asset, business) are asset value expressed along three axes; control capability corresponds to resistance strength. The tool has no separate asset register — a real limitation. Name the asset you have in mind before scoring and record it in the rationale box, or the same number will mean different things to different people.',
       },
@@ -328,6 +340,12 @@ export const LEARN_TOPICS: LearnTopic[] = [
           { zh: '資產價值', en: 'Asset Value' },
           { zh: '損失量級', en: 'Loss Magnitude' },
           { zh: '人命／財產／業務', en: 'Life / Asset / Business' },
+        ],
+        [
+          { zh: '年度化損失', en: 'Annualised loss' },
+          { zh: '年度損失預期 $\\text{ALE} = \\text{SLE} \\times \\text{ARO}$', en: 'Annualised Loss Expectancy, $\\text{ALE} = \\text{SLE} \\times \\text{ARO}$' },
+          { zh: '以分布表達', en: 'Expressed as a distribution' },
+          { zh: '（不適用：序數評分）', en: '(n/a — ordinal scores)' },
         ],
       ],
     },
