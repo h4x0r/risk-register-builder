@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { ChevronDown, ChevronRight, Plus, Search, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ChevronDown, ChevronRight, Plus, Search, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,7 +38,8 @@ import { t, TranslationKey } from '@/lib/i18n';
 import {
   Language,
   RatingKey,
-  RATING_KEYS,
+  INHERENT_RATING_KEYS,
+  CONTROL_RATING_KEYS,
   ThreatCategory,
   ThreatEntry,
   ThreatSource,
@@ -162,18 +163,28 @@ function LearnHint({ topicId, label }: { topicId: string; label: string }) {
   );
 }
 
-/** How many of the six judgements carry a recorded reason. */
-function rationaleCount(entry: ThreatEntry): number {
-  return RATING_KEYS.filter((key) => (entry.rationale?.[key] ?? '').trim().length > 0).length;
+/** How many of the given judgements carry a recorded reason. */
+function rationaleCount(entry: ThreatEntry, keys: RatingKey[]): number {
+  return keys.filter((key) => (entry.rationale?.[key] ?? '').trim().length > 0).length;
 }
 
+/**
+ * Rationale boxes for one group of scores.
+ *
+ * Scoped to the keys the surrounding card actually displays. Showing all six here
+ * would offer boxes for scores that are not on screen — control capability is
+ * judged two stages to the right — and make the completeness counter disagree with
+ * the ratings beside it.
+ */
 function RationaleDrawer({
   entry,
   language,
+  keys,
   onChange,
 }: {
   entry: ThreatEntry;
   language: Language;
+  keys: RatingKey[];
   onChange: (key: RatingKey, value: string) => void;
 }) {
   return (
@@ -182,7 +193,7 @@ function RationaleDrawer({
         {t('rationaleHint', language)}
       </p>
       <div className="grid gap-2.5 sm:grid-cols-2">
-        {RATING_KEYS.map((key) => (
+        {keys.map((key) => (
           <label key={key} className="block">
             <span className="mb-1 flex items-baseline justify-between text-[11px] font-medium">
               {t(RATING_LABEL[key], language)}
@@ -205,6 +216,116 @@ function RationaleDrawer({
         ))}
       </div>
     </div>
+  );
+}
+
+/**
+ * The n/total completeness counter that opens a rationale drawer.
+ *
+ * `total` is the size of the group this card owns, not all six judgements — the
+ * counter has to agree with the ratings sitting next to it.
+ */
+function RationaleToggle({
+  open,
+  filled,
+  total,
+  language,
+  onClick,
+}: {
+  open: boolean;
+  filled: number;
+  total: number;
+  language: Language;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-expanded={open}
+      title={open ? t('hideRationale', language) : t('showRationale', language)}
+      className={cn(
+        'no-print flex shrink-0 items-center gap-1 rounded px-1.5 py-0.5 font-mono text-[10px] transition-colors hover:bg-muted',
+        filled === total
+          ? 'text-[var(--risk-low)]'
+          : filled > 0
+            ? 'text-[var(--risk-medium)]'
+            : 'text-muted-foreground'
+      )}
+    >
+      {filled}/{total}
+      <ChevronDown
+        className={cn('h-3 w-3 transition-transform', open && 'rotate-180')}
+        aria-hidden="true"
+      />
+    </button>
+  );
+}
+
+/**
+ * Delete, behind a second click.
+ *
+ * An entry now carries scores, up to six rationales and a mitigation decision, and
+ * none of that is recoverable once it is gone. A confirm step costs one click and
+ * removes the whole class of accidental loss; a modal for every row would cost more
+ * than it saves. The armed state disarms itself so it cannot be left primed.
+ */
+function DeleteEntryButton({
+  language,
+  label,
+  onDelete,
+  compact,
+}: {
+  language: Language;
+  label: string;
+  onDelete: () => void;
+  compact?: boolean;
+}) {
+  const [armed, setArmed] = useState(false);
+
+  useEffect(() => {
+    if (!armed) return;
+    const timer = setTimeout(() => setArmed(false), 4000);
+    return () => clearTimeout(timer);
+  }, [armed]);
+
+  if (armed) {
+    return (
+      <span className="no-print inline-flex items-center gap-1 whitespace-nowrap">
+        <button
+          type="button"
+          onClick={onDelete}
+          title={t('deleteWarning', language)}
+          className="whitespace-nowrap rounded px-1.5 py-0.5 text-[10px] font-semibold text-white"
+          style={{ background: 'var(--risk-high)' }}
+        >
+          {t('confirmDelete', language)}
+        </button>
+        <button
+          type="button"
+          onClick={() => setArmed(false)}
+          aria-label={t('cancel', language)}
+          className="whitespace-nowrap rounded px-1 py-0.5 text-[10px] text-muted-foreground hover:text-foreground"
+        >
+          {t('cancel', language)}
+        </button>
+      </span>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => setArmed(true)}
+      aria-label={`${t('deleteEntry', language)} — ${label}`}
+      title={t('deleteEntry', language)}
+      className={cn(
+        'no-print inline-flex shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:text-[var(--risk-high)]',
+        compact ? 'h-6 w-6' : 'h-7 w-7'
+      )}
+    >
+      <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+    </button>
   );
 }
 
@@ -406,8 +527,8 @@ export function SinglePageView() {
               </CardHeader>
               <CardContent className="space-y-2 py-2">
                 {entries.map((entry) => {
-                  const open = expanded === entry.id;
-                  const filled = rationaleCount(entry);
+                  const open = expanded === `${entry.id}::inherent`;
+                  const filled = rationaleCount(entry, INHERENT_RATING_KEYS);
 
                   return (
                     <div key={entry.id} data-testid={`inherent-row-${entry.id}`} className="border-b pb-2 last:border-0">
@@ -416,27 +537,13 @@ export function SinglePageView() {
                           <div className="text-sm font-medium">{nameOf(entry)}</div>
                           <TaxonomyChips entry={entry} language={language} />
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => setExpanded(open ? null : entry.id)}
-                          aria-expanded={open}
-                          title={open ? t('hideRationale', language) : t('showRationale', language)}
-                          className={cn(
-                            'no-print flex shrink-0 items-center gap-1 rounded px-1.5 py-0.5 font-mono text-[10px] transition-colors',
-                            filled === RATING_KEYS.length
-                              ? 'text-[var(--risk-low)]'
-                              : filled > 0
-                                ? 'text-[var(--risk-medium)]'
-                                : 'text-muted-foreground',
-                            'hover:bg-muted'
-                          )}
-                        >
-                          {filled}/{RATING_KEYS.length}
-                          <ChevronDown
-                            className={cn('h-3 w-3 transition-transform', open && 'rotate-180')}
-                            aria-hidden="true"
-                          />
-                        </button>
+                        <RationaleToggle
+                          open={open}
+                          filled={filled}
+                          total={INHERENT_RATING_KEYS.length}
+                          language={language}
+                          onClick={() => setExpanded(open ? null : `${entry.id}::inherent`)}
+                        />
                       </div>
 
                       <div className="mt-2 grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1.5">
@@ -464,6 +571,7 @@ export function SinglePageView() {
                           <RationaleDrawer
                             entry={entry}
                             language={language}
+                            keys={INHERENT_RATING_KEYS}
                             onChange={(key, value) => setRationale(entry, key, value)}
                           />
                         </div>
@@ -502,49 +610,67 @@ export function SinglePageView() {
               <CardContent className="space-y-2 py-2">
                 {entries.map((entry) => {
                   const level = calculateRiskLevel(entry);
+                  const open = expanded === `${entry.id}::controls`;
+                  const filled = rationaleCount(entry, CONTROL_RATING_KEYS);
+
                   return (
-                    <div key={entry.id} className="flex items-center gap-2 border-b pb-2 last:border-0">
-                      <div className="min-w-0 flex-1 space-y-1">
-                        <div className="truncate text-xs font-medium">{nameOf(entry)}</div>
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                          {(['controlInternal', 'controlExternal'] as const).map((key) => (
-                            <span key={key} className="flex items-center gap-1.5">
-                              <span className="w-8 text-[10px] text-muted-foreground">
-                                {t(RATING_LABEL[key], language).slice(0, 2)}
+                    <div
+                      key={entry.id}
+                      data-testid={`controls-row-${entry.id}`}
+                      className="border-b pb-2 last:border-0"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <div className="truncate text-xs font-medium">{nameOf(entry)}</div>
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                            {CONTROL_RATING_KEYS.map((key) => (
+                              <span key={key} className="flex items-center gap-1.5">
+                                <span className="w-8 text-[10px] text-muted-foreground">
+                                  {t(RATING_LABEL[key], language).slice(0, 2)}
+                                </span>
+                                <RatingScale
+                                  label={`${nameOf(entry)} ${t(RATING_LABEL[key], language)}`}
+                                  value={entry[key]}
+                                  reversed
+                                  onChange={(v) => updateEntry(entry.id, { [key]: v })}
+                                />
                               </span>
-                              <RatingScale
-                                label={`${nameOf(entry)} ${t(RATING_LABEL[key], language)}`}
-                                value={entry[key]}
-                                reversed
-                                onChange={(v) => updateEntry(entry.id, { [key]: v })}
-                              />
-                            </span>
-                          ))}
+                            ))}
+                          </div>
                         </div>
+
+                        <div className="shrink-0 text-right">
+                          <div className="font-mono text-[10px] tabular text-muted-foreground">
+                            {calculateInherentThreat(entry).toFixed(0)} →{' '}
+                            {calculateResidualRisk(entry).toFixed(1)}
+                          </div>
+                          <span
+                            className="mt-0.5 inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold text-white"
+                            style={{ background: RISK_VAR[level] }}
+                          >
+                            {getRiskLevelLabel(level, language)}
+                          </span>
+                        </div>
+
+                        <RationaleToggle
+                          open={open}
+                          filled={filled}
+                          total={CONTROL_RATING_KEYS.length}
+                          language={language}
+                          onClick={() => setExpanded(open ? null : `${entry.id}::controls`)}
+                        />
                       </div>
 
-                      <div className="shrink-0 text-right">
-                        <div className="font-mono text-[10px] tabular text-muted-foreground">
-                          {calculateInherentThreat(entry).toFixed(0)} →{' '}
-                          {calculateResidualRisk(entry).toFixed(1)}
+                      {open && (
+                        <div className="mt-2.5">
+                          <RationaleDrawer
+                            entry={entry}
+                            language={language}
+                            keys={CONTROL_RATING_KEYS}
+                            onChange={(key, value) => setRationale(entry, key, value)}
+                          />
                         </div>
-                        <span
-                          className="mt-0.5 inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold text-white"
-                          style={{ background: RISK_VAR[level] }}
-                        >
-                          {getRiskLevelLabel(level, language)}
-                        </span>
-                      </div>
-
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="no-print h-6 w-6 shrink-0 p-0 text-muted-foreground hover:text-[var(--risk-high)]"
-                        aria-label={`${t('delete', language)} ${nameOf(entry)}`}
-                        onClick={() => removeEntry(entry.id)}
-                      >
-                        <X className="h-3.5 w-3.5" aria-hidden="true" />
-                      </Button>
+                      )}
                     </div>
                   );
                 })}
@@ -590,6 +716,11 @@ export function SinglePageView() {
                       <th className="p-2 text-center font-medium">{t('residualRisk', language)}</th>
                       <th className="p-2 text-center font-medium">{t('riskLevel', language)}</th>
                       <th className="p-2 text-left font-medium">{t('mitigationStrategy', language)}</th>
+                      {/* Wide enough for the armed confirm state, so arming does not
+                          reflow the row or wrap the labels. */}
+                      <th className="no-print w-28 p-2">
+                        <span className="sr-only">{t('deleteEntry', language)}</span>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -635,6 +766,13 @@ export function SinglePageView() {
                               className="h-8 text-sm"
                               placeholder="—"
                               aria-label={`${t('mitigationStrategy', language)} ${nameOf(entry)}`}
+                            />
+                          </td>
+                          <td className="no-print p-2 text-right">
+                            <DeleteEntryButton
+                              language={language}
+                              label={nameOf(entry)}
+                              onDelete={() => removeEntry(entry.id)}
                             />
                           </td>
                         </tr>

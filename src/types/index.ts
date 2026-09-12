@@ -74,14 +74,26 @@ export type RatingKey =
   | 'controlInternal'
   | 'controlExternal';
 
-export const RATING_KEYS: RatingKey[] = [
+/**
+ * The four judgements that make up inherent risk — the ones the Inherent Risk card
+ * displays, and therefore the only ones whose rationale belongs beside it.
+ */
+export const INHERENT_RATING_KEYS: RatingKey[] = [
   'probability',
   'impactLife',
   'impactAsset',
   'impactBusiness',
-  'controlInternal',
-  'controlExternal',
 ];
+
+/** The two control-capability judgements, scored in the Controls stage. */
+export const CONTROL_RATING_KEYS: RatingKey[] = ['controlInternal', 'controlExternal'];
+
+/**
+ * All six, in scoring order. Kept as the concatenation of the two groups so a key
+ * can never be added to one without appearing here — the export columns read from
+ * this list, and a key missing from it would silently drop its rationale.
+ */
+export const RATING_KEYS: RatingKey[] = [...INHERENT_RATING_KEYS, ...CONTROL_RATING_KEYS];
 
 /**
  * Why each score was chosen.

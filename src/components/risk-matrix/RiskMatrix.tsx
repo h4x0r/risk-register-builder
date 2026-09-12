@@ -89,13 +89,22 @@ export function RiskMatrix({
     <TooltipProvider delayDuration={120}>
       <figure className="m-0 w-full">
         <div className="flex">
-          {/* Probability axis */}
+          {/* Probability axis.
+
+              The two scripts need different vertical treatments. Latin is rotated so
+              it reads bottom-to-top, the usual y-axis convention. Chinese must NOT be
+              rotated: CJK sets vertically by default and reads top-to-bottom, so the
+              180-degree turn reverses it — 發生機率 comes out as 率機生發. */}
           <div className="mr-1.5 flex w-4 shrink-0 items-center justify-center">
             <span
               className="whitespace-nowrap text-[10px] uppercase tracking-[0.14em] text-muted-foreground"
-              style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
+              style={
+                language === 'zh-TW'
+                  ? { writingMode: 'vertical-rl', textOrientation: 'upright' }
+                  : { writingMode: 'vertical-rl', transform: 'rotate(180deg)' }
+              }
             >
-              {t('probability', language)} →
+              {language === 'zh-TW' ? `↑ ${t('probability', language)}` : `${t('probability', language)} →`}
             </span>
           </div>
 

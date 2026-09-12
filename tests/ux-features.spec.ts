@@ -38,25 +38,80 @@ test('both matrices render, and strong controls move the threat toward the origi
   expect(await grids.count()).toBeGreaterThanOrEqual(2);
 });
 
-test('a rationale survives a reload', async ({ page }) => {
+test('each card offers a rationale box per score it actually shows', async ({ page }) => {
   await seedOneThreat(page);
 
-  await page.getByRole('button', { name: /0\/6/ }).first().click();
-  const field = page.getByPlaceholder(/Why this score/).first();
-  await field.fill('Two attempts blocked in the last 12 months.');
+  // The Inherent card scores four judgements, so it owns four boxes — not six.
+  // Offering boxes for control scores that are judged two stages to the right was
+  // the confusion this grouping fixes.
+  const inherentRow = page.locator('[data-testid^="inherent-row-"]').first();
+  await inherentRow.getByRole('button', { name: /0\/4/ }).click();
+  await expect(inherentRow.getByPlaceholder(/Why this score/)).toHaveCount(4);
+  await expect(inherentRow).toContainText('Probability');
+  await expect(inherentRow).not.toContainText('Internal Resources');
+
+  // The Controls card scores the other two and owns exactly those.
+  const controlsRow = page.locator('[data-testid^="controls-row-"]').first();
+  await controlsRow.getByRole('button', { name: /0\/2/ }).click();
+  await expect(controlsRow.getByPlaceholder(/Why this score/)).toHaveCount(2);
+  await expect(controlsRow).toContainText('Internal Resources');
+  await expect(controlsRow).toContainText('External Resources');
+});
+
+test('a rationale survives a reload, on either card', async ({ page }) => {
+  await seedOneThreat(page);
+
+  const inherentRow = page.locator('[data-testid^="inherent-row-"]').first();
+  await inherentRow.getByRole('button', { name: /0\/4/ }).click();
+  await inherentRow.getByPlaceholder(/Why this score/).first()
+    .fill('Two attempts blocked in the last 12 months.');
+
+  const controlsRow = page.locator('[data-testid^="controls-row-"]').first();
+  await controlsRow.getByRole('button', { name: /0\/2/ }).click();
+  await controlsRow.getByPlaceholder(/Why this score/).first()
+    .fill('Backups restored successfully in the March test.');
   await page.waitForTimeout(400);
 
   await page.reload();
   await page.waitForTimeout(1000);
 
-  // The counter reflects it without reopening the drawer...
-  await expect(page.getByRole('button', { name: /1\/6/ })).toBeVisible();
+  // Both counters reflect it without reopening either drawer.
+  await expect(page.locator('[data-testid^="inherent-row-"]').first()
+    .getByRole('button', { name: /1\/4/ })).toBeVisible();
+  await expect(page.locator('[data-testid^="controls-row-"]').first()
+    .getByRole('button', { name: /1\/2/ })).toBeVisible();
 
-  // ...and the text itself came back.
-  await page.getByRole('button', { name: /1\/6/ }).first().click();
-  await expect(page.getByPlaceholder(/Why this score/).first()).toHaveValue(
-    'Two attempts blocked in the last 12 months.'
-  );
+  // And the control rationale text itself came back.
+  await page.locator('[data-testid^="controls-row-"]').first()
+    .getByRole('button', { name: /1\/2/ }).click();
+  await expect(page.locator('[data-testid^="controls-row-"]').first()
+    .getByPlaceholder(/Why this score/).first())
+    .toHaveValue('Backups restored successfully in the March test.');
+});
+
+test('deleting an entry takes two clicks and can be backed out of', async ({ page }) => {
+  await seedOneThreat(page);
+
+  const rows = page.getByTestId('risk-register-table').locator('tbody tr');
+  await expect(rows).toHaveCount(1);
+
+  // One click arms rather than deletes: an entry carries scores, rationale and a
+  // mitigation decision, none of it recoverable.
+  await rows.first().getByRole('button', { name: /Delete this entry/ }).click();
+  await expect(rows).toHaveCount(1);
+
+  // Backing out leaves it alone.
+  await page.getByRole('button', { name: /^Cancel$/ }).click();
+  await expect(rows).toHaveCount(1);
+
+  // Confirming removes it, and it stays removed across a reload.
+  await rows.first().getByRole('button', { name: /Delete this entry/ }).click();
+  await page.getByRole('button', { name: /^Delete\?$/ }).click();
+  await expect(page.getByTestId('risk-register-table')).toHaveCount(0);
+
+  await page.reload();
+  await page.waitForTimeout(1000);
+  await expect(page.getByTestId('risk-register-table')).toHaveCount(0);
 });
 
 test('the responsibility notice is on the page and expands in full', async ({ page }) => {

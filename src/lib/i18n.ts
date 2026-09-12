@@ -290,6 +290,18 @@ export const translations = {
     'zh-TW': '展開評分理由',
     en: 'Show rationale',
   },
+  deleteEntry: {
+    'zh-TW': '刪除此項',
+    en: 'Delete this entry',
+  },
+  confirmDelete: {
+    'zh-TW': '確定刪除？',
+    en: 'Delete?',
+  },
+  deleteWarning: {
+    'zh-TW': '刪除後，該項的評分、理由及緩解策略將一併移除。',
+    en: 'Deleting removes its scores, rationale and mitigation along with it.',
+  },
   hideRationale: {
     'zh-TW': '收起評分理由',
     en: 'Hide rationale',
