@@ -59,18 +59,27 @@ describe('learning content integrity', () => {
     expect(treatment.citations.some((c) => c.url.includes('orange-book'))).toBe(true);
   });
 
-  it('separates Take from Tolerate and states the option counts', () => {
-    // A reader asked whether Take and Tolerate are the same thing — they overlap,
-    // and the first wording made them read identically. The distinction is the
-    // direction of the change, and the counts differ across the three documents:
-    // ISO 31000:2018 has 7 options, the 2020 Orange Book 6, the mnemonic 4 (or 5).
-    const text = getLearnTopic('treatment')!.paragraphs.map((p) => p.en).join(' ');
+  it('folds Take into Tolerate and maps the four Ts onto all seven ISO options', () => {
+    // Deliberately NOT five Ts. In a security register, taking risk to pursue an
+    // opportunity is a business decision made upstream that creates the exposure —
+    // it is not a way of treating one. Where opportunity does drive the call, the
+    // action is still tolerating; only the recorded reason differs.
+    const topic = getLearnTopic('treatment')!;
+    const text = topic.paragraphs.map((p) => p.en).join(' ');
 
-    expect(text).toContain('does this decision change the risk level');
+    expect(topic.summary.en).not.toContain('Take');
+    expect(text).toContain('This course does not');
+    expect(text).toContain('still tolerating');
+
+    // The counts must add up, which is the reason the merge is defensible.
     expect(text).toContain('seven options');
-    expect(text).toContain('six');
-    // Treat absorbing three ISO options is why five Ts can cover seven.
-    expect(text).toContain('absorbs three');
+    expect(text).toContain('no remainder');
+    expect(text).toContain('Tolerate two');
+
+    // No fifth row survives in the mapping table.
+    const options = topic.table!.rows.map((r) => r[0].en);
+    expect(options).toHaveLength(4);
+    expect(options.join(' ')).not.toContain('(Take)');
   });
 
   it('keeps ALE out of the FAIR topic', () => {

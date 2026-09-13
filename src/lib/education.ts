@@ -760,20 +760,20 @@ export const LEARN_TOPICS: LearnTopic[] = [
         en: 'A note on provenance: the four Ts are often said to come from HM Treasury\'s Orange Book, but the 2020 edition does not use the words "terminate" or "tolerate" at all — it uses ISO 31000\'s wording. The four Ts is a practitioner\'s memory aid; ISO 31000 clause 6.5.2 and the Orange Book carry the formal list. Teach them side by side, but do not present the mnemonic as the standard\'s own text.',
       },
       {
-        zh: '口訣也丟失了兩樣東西，兩樣都值得補回。其一，ISO 31000 與 Orange Book 都列有「為追求機會而承擔或增加風險」—— 風險不只有下行。有些機構因此用「五個 T」，補上 Take（把握機會）。其二，ISO 把「處理」拆成「改變可能性」與「改變後果」兩項；這正是預防性控制與緩減性控制的分別（防止火災發生，與安裝灑水系統限制火災損失，是兩回事）。一個 T 蓋過了這個分別。',
-        en: 'The mnemonic also loses two things worth restoring. First, both ISO 31000 and the Orange Book list "taking or increasing the risk in order to pursue an opportunity" — risk is not only downside. Some organisations therefore use five Ts, adding Take. Second, ISO splits Treat into "changing the likelihood" and "changing the consequences" — which is the difference between preventive and mitigative controls (stopping a fire starting is not the same as sprinklers limiting what it destroys). One T hides that distinction.',
+        zh: '口訣掩蓋了一個值得補回的分別：ISO 把「處理」拆成「改變可能性」與「改變後果」兩項，而這正是預防性控制與緩減性控制之別 —— 防止火災發生，與安裝灑水系統以限制火災損失，是兩回事，兩者的成本、失效模式與見效時機都不同。一個 T 把它們蓋成一片。評分時可以自問：這項控制是令它較難發生，還是令它發生後沒那麼嚴重？',
+        en: 'The mnemonic does hide one distinction worth restoring. ISO splits Treat into "changing the likelihood" and "changing the consequences", which is the difference between preventive and mitigative controls: stopping a fire starting is not the same as sprinklers limiting what it destroys, and the two differ in cost, in how they fail, and in when they pay off. One T covers both. A useful question while scoring: does this control make it less likely to happen, or less bad when it does?',
       },
       {
-        zh: '「把握」與「容忍」看似同一回事，值得分清楚 —— ISO 31000 亦把兩者列為並列的選項。分別在方向與動機：容忍針對一項已經存在的風險，決定按現有水平承擔，風險水平不變，理由通常是處理的成本高於所省的損失，或風險本就在胃納之內；把握則是主動承接一項原本沒有的風險，或刻意加大現有風險，因為那正是取得回報的途徑，風險水平是向上的。一句判準：這個決定會否改變風險水平？容忍不會；把握會，而且是刻意向上。',
-        en: 'Take and Tolerate look like the same thing and are worth separating — ISO 31000 lists them as distinct options. The difference is direction and motive. Tolerating applies to an exposure you already have: you carry it at its current level, which does not change, usually because treating it costs more than it saves or it already sits within appetite. Taking means assuming an exposure you would not otherwise have, or deliberately increasing one, because that is how the return is obtained; the level goes up. The one-line test: does this decision change the risk level? Tolerate, no. Take, yes — upward and on purpose.',
+        zh: 'ISO 31000 另有一項「為追求機會而承擔或增加風險」，有人因此提出第五個 T（Take）。本課程不這樣做，因為在保安風險登記冊裡它並不是一種處理方式：沒有人會為了甚麼好處而「承擔」勒索軟件風險。決定進入一個新市場、提早推出產品、採用一項新技術 —— 這些是上游的業務決定，它們製造出敞口，而敞口進入登記冊之後，可選的動作仍然只有終止、處理、轉移、容忍四種。',
+        en: 'ISO 31000 carries a further option, "taking or increasing the risk in order to pursue an opportunity", and some people add it as a fifth T, Take. This course does not, because in a security risk register it is not a way of treating anything: nobody takes on a ransomware risk to pursue an upside. Deciding to enter a market, ship early, or adopt a new technology are business decisions made upstream. They create exposures, and once an exposure reaches the register the available actions are still only terminate, treat, transfer, tolerate.',
       },
       {
-        zh: '兩者所需的管治也不同，這是分清楚的實際好處。容忍需要一份接受紀錄：誰接受、接受到甚麼水平、何時覆檢。把握需要一份業務理據：換取甚麼回報、承受多大敞口、由誰批准 —— 因為你是在用風險換取東西，那筆交易應該有人簽名。不修後閘的鎖，是容忍；為了更好的市場而在治安較差的地區開設分店，是把握。',
-        en: 'They also call for different governance, which is the practical payoff of separating them. Tolerating needs an acceptance record: who accepted it, at what level, and when it will be revisited. Taking needs a business case: what return, against how much exposure, approved by whom — because you are spending risk to buy something, and that trade should carry a signature. Not fixing the lock on the back gate is tolerating. Opening a branch in a higher-crime district because the market is better is taking.',
+        zh: '數目上值得留意，因為三份文件的清單長度不同。ISO 31000:2018 第 6.5.2 條列出七項選項；英國財政部 2020 年版 Orange Book 列出六項（少了「移除風險源」）；口訣則是四個 T。四個 T 剛好完整覆蓋 ISO 的七項，沒有餘數：終止 1 項、處理 3 項（移除風險源、改變可能性、改變後果）、轉移 1 項、容忍 2 項（知情保留、為機會而承擔）。壓縮本身沒有問題 —— 但要知道自己把甚麼壓在一起。',
+        en: 'The counts are worth noting, because the three documents list different numbers. ISO 31000:2018 clause 6.5.2 gives seven options; HM Treasury\'s 2020 Orange Book gives six (it drops "removing the risk source"); the mnemonic gives four. The four Ts cover all seven with no remainder: Terminate takes one, Treat absorbs three (removing the risk source, changing the likelihood, changing the consequences), Transfer one, and Tolerate two (retaining by informed decision, and taking risk to pursue an opportunity). Compressing is fine — knowing what you compressed together is the point.',
       },
       {
-        zh: '數目上也值得留意，因為三份文件的清單長度不同。ISO 31000:2018 第 6.5.2 條列出七項選項；英國財政部 2020 年版 Orange Book 列出六項（少了「移除風險源」）；而口訣是四個 T，加上 Take 則是五個。五個 T 之所以能對應七項，是因為「處理」一個字同時涵蓋了 ISO 的三項：移除風險源、改變可能性、改變後果。壓縮本身沒有問題 —— 但要知道自己壓縮了甚麼。',
-        en: 'The counts are worth noting, because the three documents list different numbers. ISO 31000:2018 clause 6.5.2 gives seven options; HM Treasury\'s 2020 Orange Book gives six (it drops "removing the risk source"); the mnemonic gives four Ts, or five with Take. Five Ts can cover seven options because Treat alone absorbs three of them: removing the risk source, changing the likelihood, and changing the consequences. Compressing is fine — knowing what you compressed is the point.',
+        zh: '機會確實會左右決定 —— 「為趕上發佈，這個漏洞暫時不修」正是為了回報而承擔風險。但那件事本身仍然是容忍：動作一樣（照原樣承擔），分別只在理由。所以理由要寫進接受紀錄裡：是因為處理成本高於所省損失，還是因為要換取某項回報？兩者的覆檢時機完全不同 —— 前者等成本改變，後者等那項回報兌現或落空。本工具的「評分理由」與「緩解策略」兩欄，正是寫這件事的地方。',
+        en: 'Opportunity does drive real decisions — "we are not fixing this vulnerability before the launch" is accepting risk for a return. But that is still tolerating: the action is identical, only the reason differs. So the reason belongs in the acceptance record. Was it accepted because treating costs more than it saves, or because a return was being bought? Those two come up for review at completely different moments — one when the cost changes, the other when the return either lands or does not. The rationale and mitigation fields in this tool are where that belongs.',
       },
       {
         zh: '兩點常見誤解值得指出。其一，轉移不等於消失：買了保險，聲譽損失與監管責任通常仍留在你身上。其二，接受不等於忽視 —— 有效的接受需要指明由誰接受、接受到甚麼水平、何時覆檢。沒有記錄的接受，實際上只是沒有人處理。',
@@ -808,13 +808,8 @@ export const LEARN_TOPICS: LearnTopic[] = [
         ],
         [
           { zh: '容忍 Tolerate', en: 'Tolerate' },
-          { zh: '知情下按現有水平承擔 —— 風險水平不變', en: 'Carry it knowingly at its current level — the level does not change' },
-          { zh: '在知情決定下保留風險', en: 'Retaining the risk by informed decision' },
-        ],
-        [
-          { zh: '（把握 Take）', en: '(Take)' },
-          { zh: '為換取回報而主動承接新風險或加大現有風險 —— 風險水平刻意上升', en: 'Take on new exposure, or increase existing exposure, to obtain an upside — the level goes up on purpose' },
-          { zh: '為追求機會而承擔或增加風險', en: 'Taking or increasing the risk in order to pursue an opportunity' },
+          { zh: '知情下承擔（涵蓋 ISO 兩項）', en: 'Carry it knowingly — covers two ISO options' },
+          { zh: '在知情決定下保留風險；為追求機會而承擔或增加風險', en: 'Retaining the risk by informed decision; taking or increasing the risk in order to pursue an opportunity' },
         ],
       ],
     },
