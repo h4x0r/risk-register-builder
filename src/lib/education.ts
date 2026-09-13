@@ -3,9 +3,10 @@
  *
  * Copyright © 2026 Albert Hui (許君泰). All rights reserved.
  *
- * The explanatory text in this file is original authored work. The standards it
- * cites belong to their respective publishers (ISO, NIST, FIRST, The Open Group,
- * Microsoft and others) and are referenced, not reproduced.
+ * The explanatory text in this file is original authored work, written to serve as
+ * reference as much as instruction. The standards it cites belong to their
+ * respective publishers (ISO, NIST, FIRST, The Open Group, Microsoft and others)
+ * and are referenced, not reproduced.
  *
  * This tool is a teaching aid, so every axis it asks a student to use is explained
  * here against the standard it comes from, with a link for further study.

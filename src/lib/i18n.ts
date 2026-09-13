@@ -391,8 +391,10 @@ export const translations = {
     en: 'Learn about:',
   },
   educationCopyright: {
-    'zh-TW': '教學內容版權所有 © 2026 許君泰（Albert Hui）。所引用之標準，版權歸各出版機構所有。',
-    en: 'Teaching content © 2026 Albert Hui. All rights reserved. Cited standards remain the copyright of their respective publishers.',
+    // Not "teaching content": the same text serves as reference, so the notice
+    // covers the work rather than one use of it.
+    'zh-TW': '版權所有 © 2026 許君泰（Albert Hui）。所引用之標準，版權歸各出版機構所有。',
+    en: 'Copyright © 2026 Albert Hui. All rights reserved. Cited standards remain the copyright of their respective publishers.',
   },
 
   // Taxonomy
