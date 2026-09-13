@@ -133,6 +133,27 @@ describe('learning content integrity', () => {
     }
   });
 
+  it('addresses the reader, not their instructor', () => {
+    // The panel is read by students. A sentence like "Teach them side by side"
+    // speaks past the reader to whoever is running the course, and tells them what
+    // to do with a fact instead of what the fact means. Caught once in the
+    // provenance note; this stops it coming back.
+    const INSTRUCTOR_VOICE = [
+      /\bteach (them|this|students|it) /i,
+      /\byour students\b/i,
+      /\bthe class\b/i,
+      /\bremind students\b/i,
+      /\bexplain to (them|students)\b/i,
+      /\blearners should\b/i,
+    ];
+
+    for (const { path, value } of allBilingual()) {
+      for (const pattern of INSTRUCTOR_VOICE) {
+        expect(pattern.test(value.en), `${path} (en) speaks to an instructor: ${value.en.slice(0, 90)}`).toBe(false);
+      }
+    }
+  });
+
   it('cites at least one source on every topic', () => {
     // A teaching claim with no citation is an assertion, which is what this app is
     // trying to teach students not to accept.

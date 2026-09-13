@@ -756,8 +756,8 @@ export const LEARN_TOPICS: LearnTopic[] = [
         en: 'For any given risk the options are usually remembered as the four Ts: Terminate, Treat, Transfer, Tolerate. The mnemonic is in wide use in UK public-sector risk practice — the UK government\'s own fraud risk assessment practice note lists exactly these four. It is memorable, and the four are genuinely distinct.',
       },
       {
-        zh: '要留意出處：坊間常說「四個 T 出自英國財政部的 Orange Book」，但 2020 年版的 Orange Book 其實沒有用過 terminate 或 tolerate 這些字 —— 它採用的是 ISO 31000 的措辭。四個 T 是實務界的記憶口訣，ISO 31000 第 6.5.2 條與 Orange Book 才是正式的選項清單。兩者可以對照使用，但不要把口訣說成標準原文。',
-        en: 'A note on provenance: the four Ts are often said to come from HM Treasury\'s Orange Book, but the 2020 edition does not use the words "terminate" or "tolerate" at all — it uses ISO 31000\'s wording. The four Ts is a practitioner\'s memory aid; ISO 31000 clause 6.5.2 and the Orange Book carry the formal list. Teach them side by side, but do not present the mnemonic as the standard\'s own text.',
+        zh: '要留意出處：坊間常說「四個 T 出自英國財政部的 Orange Book」，但 2020 年版的 Orange Book 其實沒有用過 terminate 或 tolerate 這些字 —— 它採用的是 ISO 31000 的措辭。口訣來自實務界；正式的選項清單在 ISO 31000 第 6.5.2 條與 Orange Book 之中。這在引用時有實際分別：在報告或功課裡寫「Orange Book 的四個 T」，是一個經不起查證的引註。',
+        en: 'A note on provenance: the four Ts are often said to come from HM Treasury\'s Orange Book, but the 2020 edition does not use the words "terminate" or "tolerate" at all — it uses ISO 31000\'s wording. The mnemonic comes from practice; the formal list lives in ISO 31000 clause 6.5.2 and in the Orange Book. The difference shows up when you cite: writing "the Orange Book\'s four Ts" in a report is a citation that does not survive checking.',
       },
       {
         zh: '口訣掩蓋了一個值得補回的分別：ISO 把「處理」拆成「改變可能性」與「改變後果」兩項，而這正是預防性控制與緩減性控制之別 —— 防止火災發生，與安裝灑水系統以限制火災損失，是兩回事，兩者的成本、失效模式與見效時機都不同。一個 T 把它們蓋成一片。評分時可以自問：這項控制是令它較難發生，還是令它發生後沒那麼嚴重？',
