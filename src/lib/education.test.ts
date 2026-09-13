@@ -59,6 +59,20 @@ describe('learning content integrity', () => {
     expect(treatment.citations.some((c) => c.url.includes('orange-book'))).toBe(true);
   });
 
+  it('separates Take from Tolerate and states the option counts', () => {
+    // A reader asked whether Take and Tolerate are the same thing — they overlap,
+    // and the first wording made them read identically. The distinction is the
+    // direction of the change, and the counts differ across the three documents:
+    // ISO 31000:2018 has 7 options, the 2020 Orange Book 6, the mnemonic 4 (or 5).
+    const text = getLearnTopic('treatment')!.paragraphs.map((p) => p.en).join(' ');
+
+    expect(text).toContain('does this decision change the risk level');
+    expect(text).toContain('seven options');
+    expect(text).toContain('six');
+    // Treat absorbing three ISO options is why five Ts can cover seven.
+    expect(text).toContain('absorbs three');
+  });
+
   it('keeps ALE out of the FAIR topic', () => {
     // ALE is not part of FAIR. Filing it there would teach the conflation this
     // content spends its time correcting.

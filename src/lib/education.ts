@@ -764,6 +764,18 @@ export const LEARN_TOPICS: LearnTopic[] = [
         en: 'The mnemonic also loses two things worth restoring. First, both ISO 31000 and the Orange Book list "taking or increasing the risk in order to pursue an opportunity" — risk is not only downside. Some organisations therefore use five Ts, adding Take. Second, ISO splits Treat into "changing the likelihood" and "changing the consequences" — which is the difference between preventive and mitigative controls (stopping a fire starting is not the same as sprinklers limiting what it destroys). One T hides that distinction.',
       },
       {
+        zh: '「把握」與「容忍」看似同一回事，值得分清楚 —— ISO 31000 亦把兩者列為並列的選項。分別在方向與動機：容忍針對一項已經存在的風險，決定按現有水平承擔，風險水平不變，理由通常是處理的成本高於所省的損失，或風險本就在胃納之內；把握則是主動承接一項原本沒有的風險，或刻意加大現有風險，因為那正是取得回報的途徑，風險水平是向上的。一句判準：這個決定會否改變風險水平？容忍不會；把握會，而且是刻意向上。',
+        en: 'Take and Tolerate look like the same thing and are worth separating — ISO 31000 lists them as distinct options. The difference is direction and motive. Tolerating applies to an exposure you already have: you carry it at its current level, which does not change, usually because treating it costs more than it saves or it already sits within appetite. Taking means assuming an exposure you would not otherwise have, or deliberately increasing one, because that is how the return is obtained; the level goes up. The one-line test: does this decision change the risk level? Tolerate, no. Take, yes — upward and on purpose.',
+      },
+      {
+        zh: '兩者所需的管治也不同，這是分清楚的實際好處。容忍需要一份接受紀錄：誰接受、接受到甚麼水平、何時覆檢。把握需要一份業務理據：換取甚麼回報、承受多大敞口、由誰批准 —— 因為你是在用風險換取東西，那筆交易應該有人簽名。不修後閘的鎖，是容忍；為了更好的市場而在治安較差的地區開設分店，是把握。',
+        en: 'They also call for different governance, which is the practical payoff of separating them. Tolerating needs an acceptance record: who accepted it, at what level, and when it will be revisited. Taking needs a business case: what return, against how much exposure, approved by whom — because you are spending risk to buy something, and that trade should carry a signature. Not fixing the lock on the back gate is tolerating. Opening a branch in a higher-crime district because the market is better is taking.',
+      },
+      {
+        zh: '數目上也值得留意，因為三份文件的清單長度不同。ISO 31000:2018 第 6.5.2 條列出七項選項；英國財政部 2020 年版 Orange Book 列出六項（少了「移除風險源」）；而口訣是四個 T，加上 Take 則是五個。五個 T 之所以能對應七項，是因為「處理」一個字同時涵蓋了 ISO 的三項：移除風險源、改變可能性、改變後果。壓縮本身沒有問題 —— 但要知道自己壓縮了甚麼。',
+        en: 'The counts are worth noting, because the three documents list different numbers. ISO 31000:2018 clause 6.5.2 gives seven options; HM Treasury\'s 2020 Orange Book gives six (it drops "removing the risk source"); the mnemonic gives four Ts, or five with Take. Five Ts can cover seven options because Treat alone absorbs three of them: removing the risk source, changing the likelihood, and changing the consequences. Compressing is fine — knowing what you compressed is the point.',
+      },
+      {
         zh: '兩點常見誤解值得指出。其一，轉移不等於消失：買了保險，聲譽損失與監管責任通常仍留在你身上。其二，接受不等於忽視 —— 有效的接受需要指明由誰接受、接受到甚麼水平、何時覆檢。沒有記錄的接受，實際上只是沒有人處理。',
         en: 'Two misconceptions are worth naming. First, transfer is not disappearance: buy insurance and the reputational loss and regulatory duty usually stay with you. Second, acceptance is not neglect — a real acceptance names who accepted it, at what level, and when it will be revisited. An acceptance nobody recorded is just nobody dealing with it.',
       },
@@ -786,8 +798,8 @@ export const LEARN_TOPICS: LearnTopic[] = [
         ],
         [
           { zh: '處理 Treat', en: 'Treat' },
-          { zh: '施加控制措施', en: 'Apply controls' },
-          { zh: '改變可能性；改變後果（包括應變預案）', en: 'Changing the likelihood; changing the consequences, including contingency planning' },
+          { zh: '施加控制措施（涵蓋 ISO 三項）', en: 'Apply controls — covers three ISO options' },
+          { zh: '移除風險源；改變可能性；改變後果（包括應變預案）', en: 'Removing the risk source; changing the likelihood; changing the consequences, including contingency planning' },
         ],
         [
           { zh: '轉移 Transfer', en: 'Transfer' },
@@ -796,12 +808,12 @@ export const LEARN_TOPICS: LearnTopic[] = [
         ],
         [
           { zh: '容忍 Tolerate', en: 'Tolerate' },
-          { zh: '知情下承擔', en: 'Carry it knowingly' },
+          { zh: '知情下按現有水平承擔 —— 風險水平不變', en: 'Carry it knowingly at its current level — the level does not change' },
           { zh: '在知情決定下保留風險', en: 'Retaining the risk by informed decision' },
         ],
         [
           { zh: '（把握 Take）', en: '(Take)' },
-          { zh: '為機會而承擔 —— 四個 T 所欠缺的第五項', en: 'Accept it to pursue an upside — the one the four Ts omit' },
+          { zh: '為換取回報而主動承接新風險或加大現有風險 —— 風險水平刻意上升', en: 'Take on new exposure, or increase existing exposure, to obtain an upside — the level goes up on purpose' },
           { zh: '為追求機會而承擔或增加風險', en: 'Taking or increasing the risk in order to pursue an opportunity' },
         ],
       ],
