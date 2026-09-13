@@ -133,23 +133,30 @@ describe('learning content integrity', () => {
     }
   });
 
-  it('addresses the reader, not their instructor', () => {
+  it('addresses the reader directly — not their instructor, nor the reader in the third person', () => {
     // The panel is read by students. A sentence like "Teach them side by side"
     // speaks past the reader to whoever is running the course, and tells them what
     // to do with a fact instead of what the fact means. Caught once in the
     // provenance note; this stops it coming back.
-    const INSTRUCTOR_VOICE = [
+    const WRONG_AUDIENCE = [
       /\bteach (them|this|students|it) /i,
       /\byour students\b/i,
       /\bthe class\b/i,
       /\bremind students\b/i,
       /\bexplain to (them|students)\b/i,
       /\blearners should\b/i,
+      // Speaking ABOUT the reader instead of to them. The file header may say
+      // "a student" — that is addressed to whoever edits the content — but nothing
+      // the reader sees should refer to them in the third person.
+      /\ba student\b/i,
+      /\bthe student\b/i,
+      /\bthe reader\b/i,
+      /\blearners\b/i,
     ];
 
     for (const { path, value } of allBilingual()) {
-      for (const pattern of INSTRUCTOR_VOICE) {
-        expect(pattern.test(value.en), `${path} (en) speaks to an instructor: ${value.en.slice(0, 90)}`).toBe(false);
+      for (const pattern of WRONG_AUDIENCE) {
+        expect(pattern.test(value.en), `${path} (en) addresses the wrong audience: ${value.en.slice(0, 90)}`).toBe(false);
       }
     }
   });

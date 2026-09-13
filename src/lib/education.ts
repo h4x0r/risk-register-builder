@@ -532,7 +532,7 @@ export const LEARN_TOPICS: LearnTopic[] = [
       },
       {
         zh: '版本差異值得留意：這份威脅例子清單以附錄 C（Examples of typical threats）的形式出現在 ISO/IEC 27005:2018；2022 年版重新編排，把相關材料併入附錄 A。若你翻開 2022 年版尋找附錄 C，會找不到。引用時應註明版本。',
-        en: 'An edition note worth carrying: the list appears as Annex C (Examples of typical threats) in ISO/IEC 27005:2018. The 2022 edition restructures that material into Annex A. A student who opens the 2022 text looking for Annex C will not find it, so cite the edition you actually used.',
+        en: 'An edition note worth carrying: the list appears as Annex C (Examples of typical threats) in ISO/IEC 27005:2018. The 2022 edition restructures that material into Annex A. Open the 2022 text looking for Annex C and you will not find it, so cite the edition you actually used.',
       },
       {
         zh: '本工具在該骨幹之上加入了四個類別 —— 人員與內部威脅、營運與流程、第三方與供應鏈、法律與合規 —— 因為單靠原目錄，人員風險與第三方風險沒有恰當的歸屬。任何擴充都應如此：說明你擴充了甚麼，以及為甚麼。',
@@ -688,8 +688,8 @@ export const LEARN_TOPICS: LearnTopic[] = [
         en: '$$\\text{Residual} = \\text{Inherent} \\times \\frac{C_{\\text{int}} + C_{\\text{ext}} - 2}{8}$$ Control capability is scored 1 = strong, 5 = weak, so when both are strongest (1 + 1 = 2) the factor is 0, and when both are weakest (5 + 5 = 10) the factor is 1. The bands are: ≤ 6 low, ≤ 18 medium, > 18 high.',
       },
       {
-        zh: '這裡有一個必須看見的簡化：當控制能力評為最強時，剩餘風險會變成 0。現實中沒有任何控制組合能把風險降至零 —— 剩餘風險永遠存在，只是小到可以接受。模型的這個下限是計算上的方便，不是對世界的描述。同理，序數相乘沒有真正的算術意義：分數 40 並不代表其危害是分數 20 的兩倍。',
-        en: 'There is a simplification here that you should see: when control capability is scored strongest, residual risk becomes 0. No real set of controls reduces risk to zero — residual risk always remains, it merely becomes small enough to accept. That floor is a computational convenience, not a description of the world. In the same way, multiplying ordinals has no true arithmetic meaning: a score of 40 does not represent twice the harm of a score of 20.',
+        zh: '這裡有一個值得看清楚的簡化：當控制能力評為最強時，剩餘風險會變成 0。現實中沒有任何控制組合能把風險降至零 —— 剩餘風險永遠存在，只是小到可以接受。模型的這個下限是計算上的方便，不是對世界的描述。同理，序數相乘沒有真正的算術意義：分數 40 並不代表其危害是分數 20 的兩倍。',
+        en: 'There is a simplification here worth seeing: when control capability is scored strongest, residual risk becomes 0. No real set of controls reduces risk to zero — residual risk always remains, it merely becomes small enough to accept. That floor is a computational convenience, not a description of the world. In the same way, multiplying ordinals has no true arithmetic meaning: a score of 40 does not represent twice the harm of a score of 20.',
       },
       {
         zh: '那麼分數有甚麼用？用於分流與排序：在同一份登記冊、由同一批人以同一套準則評分的前提下，把注意力引導到最需要處理的項目。跨組織或跨時期比較分數，則需要先確認準則一致。',
@@ -718,8 +718,8 @@ export const LEARN_TOPICS: LearnTopic[] = [
         en: 'The limits are equally real and have been examined rigorously. Cox (2008), in Risk Analysis, sets out several structural problems: risks differing by orders of magnitude can land in the same cell (range compression); in certain cases the matrix can rank pairs of risks the wrong way round; and how the cells are coloured drives the conclusion while rarely being justified.',
       },
       {
-        zh: '要準確理解 Cox 的結論：他指出的不只是「不夠精確」，而是矩陣在某些情況下會把風險的先後次序排反，並因此把資源配置到錯誤的地方；共用同一套準則並不能消除這個結構性問題。因此，本課程繼續使用矩陣是一個教學上的取捨 —— 它易讀、易溝通 —— 而不是說該批評不成立。使用的條件是：把矩陣視為溝通與分流的工具，而不是量度工具；凡是會左右實際決定的排序，都必須另行覆核。當一項決定的代價足以令排序錯誤造成實質後果時，就應該改用量化方法（例如 FAIR），而不是把矩陣的格子再細分。',
-        en: 'Read Cox\'s conclusion precisely: he documents not merely imprecision but ranking reversals, and resource allocation that follows them to the wrong place; shared criteria do not remove that structural problem. Continuing to use a matrix here is therefore a teaching trade-off — it is readable and it communicates — not a claim that the critique fails. The condition for using one is to treat it as an instrument for communication and triage rather than measurement, and to re-examine by hand any ranking that will drive a real decision. When a decision is costly enough that a mis-ranking would matter, move to a quantitative method such as FAIR rather than subdividing the cells.',
+        zh: '要準確理解 Cox 的結論：他指出的不只是「不夠精確」，而是矩陣在某些情況下會把風險的先後次序排反，並因此把資源配置到錯誤的地方；共用同一套準則並不能消除這個結構性問題。因此，本工具繼續使用矩陣，是一個刻意的取捨 —— 它易讀、易溝通 —— 而不是說該批評不成立。使用的條件是：把矩陣視為溝通與分流的工具，而不是量度工具；凡是會左右實際決定的排序，都必須另行覆核。當一項決定的代價足以令排序錯誤造成實質後果時，就應該改用量化方法（例如 FAIR），而不是把矩陣的格子再細分。',
+        en: 'Read Cox\'s conclusion precisely: he documents not merely imprecision but ranking reversals, and resource allocation that follows them to the wrong place; shared criteria do not remove that structural problem. Continuing to use a matrix here is therefore a deliberate trade-off — it is readable and it communicates — not a claim that the critique fails. The condition for using one is to treat it as an instrument for communication and triage rather than measurement, and to re-examine by hand any ranking that will drive a real decision. When a decision is costly enough that a mis-ranking would matter, move to a quantitative method such as FAIR rather than subdividing the cells.',
       },
       {
         zh: '本工具並排顯示兩個矩陣：左邊為固有風險（未計入控制措施），右邊為剩餘風險（計入之後）。兩個矩陣使用同一個格子底色，因此唯一移動的是威脅本身 —— 那正是這一對圖要展示的比較。',
