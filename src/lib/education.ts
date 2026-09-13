@@ -213,6 +213,18 @@ const CITE = {
     url: 'https://csrc.nist.gov/pubs/ir/8286/a/final',
     access: 'free',
   },
+  orangeBook: {
+    ref: 'HM Treasury — The Orange Book',
+    title: { zh: '風險管理：原則與概念', en: 'Management of Risk — Principles and Concepts' },
+    url: 'https://www.gov.uk/government/publications/orange-book',
+    access: 'free',
+  },
+  govukFourTs: {
+    ref: 'GOV.UK',
+    title: { zh: '全面詐騙風險評估實務指引（列明四個 T）', en: 'Full Fraud Risk Assessment Practice Note (names the four Ts)' },
+    url: 'https://www.gov.uk/government/publications/full-fraud-risk-assessment-practice-note/full-fraud-risk-assessment-practice-note-html',
+    access: 'free',
+  },
   cvss: {
     ref: 'FIRST — CVSS v4.0',
     title: { zh: '通用漏洞評分系統規格文件', en: 'Common Vulnerability Scoring System v4.0 Specification' },
@@ -735,13 +747,21 @@ export const LEARN_TOPICS: LearnTopic[] = [
     title: { zh: '風險處理', en: 'Risk Treatment' },
     standard: 'ISO 31000:2018 · ISO/IEC 27005:2022',
     summary: {
-      zh: '「緩解」只是四個選項之一。接受風險是正當的決定 —— 前提是有人有權作出並記錄在案。',
-      en: 'Mitigation is one option of four. Accepting a risk is a legitimate decision — provided someone with the authority makes it, on the record.',
+      zh: '四個 T：終止（Terminate）、處理（Treat）、轉移（Transfer）、容忍（Tolerate）。「處理」只是其中之一，而容忍是正當的決定 —— 前提是有人有權作出並記錄在案。',
+      en: 'The four Ts: Terminate, Treat, Transfer, Tolerate. Treating is only one of them, and tolerating is a legitimate decision — provided someone with the authority makes it, on the record.',
     },
     paragraphs: [
       {
-        zh: '標準的處理選項通常歸納為四類：規避（不做該項活動）、降低／修改（施加控制措施）、分擔／轉移（保險、合約、外判）、保留／接受（在知情下承擔）。ISO 31000 亦包括「為追求機會而承擔風險」這一項。',
-        en: 'Treatment options are usually grouped as four: avoid (do not undertake the activity), reduce or modify (apply controls), share or transfer (insurance, contracts, outsourcing), and retain or accept (carry it knowingly). ISO 31000 also includes taking on risk in order to pursue an opportunity.',
+        zh: '面對每一項風險，可選的做法通常以「四個 T」記憶：終止、處理、轉移、容忍。這個口訣在英國公營部門風險管理實務中廣泛使用，英國政府的詐騙風險評估實務指引即明文列出這四項。它好記，而且四個選項確實互相排斥、涵蓋大部分情況。',
+        en: 'For any given risk the options are usually remembered as the four Ts: Terminate, Treat, Transfer, Tolerate. The mnemonic is in wide use in UK public-sector risk practice — the UK government\'s own fraud risk assessment practice note lists exactly these four. It is memorable, and the four are genuinely distinct.',
+      },
+      {
+        zh: '要留意出處：坊間常說「四個 T 出自英國財政部的 Orange Book」，但 2020 年版的 Orange Book 其實沒有用過 terminate 或 tolerate 這些字 —— 它採用的是 ISO 31000 的措辭。四個 T 是實務界的記憶口訣，ISO 31000 第 6.5.2 條與 Orange Book 才是正式的選項清單。兩者可以對照使用，但不要把口訣說成標準原文。',
+        en: 'A note on provenance: the four Ts are often said to come from HM Treasury\'s Orange Book, but the 2020 edition does not use the words "terminate" or "tolerate" at all — it uses ISO 31000\'s wording. The four Ts is a practitioner\'s memory aid; ISO 31000 clause 6.5.2 and the Orange Book carry the formal list. Teach them side by side, but do not present the mnemonic as the standard\'s own text.',
+      },
+      {
+        zh: '口訣也丟失了兩樣東西，兩樣都值得補回。其一，ISO 31000 與 Orange Book 都列有「為追求機會而承擔或增加風險」—— 風險不只有下行。有些機構因此用「五個 T」，補上 Take（把握機會）。其二，ISO 把「處理」拆成「改變可能性」與「改變後果」兩項；這正是預防性控制與緩減性控制的分別（防止火災發生，與安裝灑水系統限制火災損失，是兩回事）。一個 T 蓋過了這個分別。',
+        en: 'The mnemonic also loses two things worth restoring. First, both ISO 31000 and the Orange Book list "taking or increasing the risk in order to pursue an opportunity" — risk is not only downside. Some organisations therefore use five Ts, adding Take. Second, ISO splits Treat into "changing the likelihood" and "changing the consequences" — which is the difference between preventive and mitigative controls (stopping a fire starting is not the same as sprinklers limiting what it destroys). One T hides that distinction.',
       },
       {
         zh: '兩點常見誤解值得指出。其一，轉移不等於消失：買了保險，聲譽損失與監管責任通常仍留在你身上。其二，接受不等於忽視 —— 有效的接受需要指明由誰接受、接受到甚麼水平、何時覆檢。沒有記錄的接受，實際上只是沒有人處理。',
@@ -752,7 +772,41 @@ export const LEARN_TOPICS: LearnTopic[] = [
         en: 'In this tool the mitigation column of the register is where that decision is recorded. Naming the option chosen and who owns it is far more useful than a general sentence about strengthening monitoring.',
       },
     ],
-    citations: [CITE.iso31000, CITE.iso27005_2022, CITE.iso22301],
+    table: {
+      headers: [
+        { zh: '選項', en: 'Option' },
+        { zh: '意思', en: 'Means' },
+        { zh: 'ISO 31000 ／ Orange Book 的措辭', en: 'ISO 31000 / Orange Book wording' },
+      ],
+      rows: [
+        [
+          { zh: '終止 Terminate', en: 'Terminate' },
+          { zh: '不做這件事', en: 'Do not do the thing' },
+          { zh: '決定不開始或不繼續引致該風險的活動，以規避風險', en: 'Avoiding the risk by deciding not to start or continue with the activity that gives rise to it' },
+        ],
+        [
+          { zh: '處理 Treat', en: 'Treat' },
+          { zh: '施加控制措施', en: 'Apply controls' },
+          { zh: '改變可能性；改變後果（包括應變預案）', en: 'Changing the likelihood; changing the consequences, including contingency planning' },
+        ],
+        [
+          { zh: '轉移 Transfer', en: 'Transfer' },
+          { zh: '與他人分擔', en: 'Share it with someone else' },
+          { zh: '分擔風險（例如透過商業合約）', en: 'Sharing the risk, e.g. through commercial contracts' },
+        ],
+        [
+          { zh: '容忍 Tolerate', en: 'Tolerate' },
+          { zh: '知情下承擔', en: 'Carry it knowingly' },
+          { zh: '在知情決定下保留風險', en: 'Retaining the risk by informed decision' },
+        ],
+        [
+          { zh: '（把握 Take）', en: '(Take)' },
+          { zh: '為機會而承擔 —— 四個 T 所欠缺的第五項', en: 'Accept it to pursue an upside — the one the four Ts omit' },
+          { zh: '為追求機會而承擔或增加風險', en: 'Taking or increasing the risk in order to pursue an opportunity' },
+        ],
+      ],
+    },
+    citations: [CITE.govukFourTs, CITE.orangeBook, CITE.iso31000, CITE.iso27005_2022, CITE.iso22301],
   },
 
   // ─────────────────────────────────────────────────────────────────────────

@@ -43,6 +43,22 @@ describe('learning content integrity', () => {
     expect(order.indexOf('fair')).toBe(order.indexOf('quantify') + 1);
   });
 
+  it('teaches the four Ts without misattributing them to the Orange Book', () => {
+    // Checked against the 2020 Orange Book PDF with a passing control: "terminate",
+    // "tolerate" and "four Ts" are all ABSENT from it. The common attribution is
+    // stale, so the lesson must name the mnemonic AND flag where it does not come
+    // from, and must restore the opportunity option the four Ts drop.
+    const treatment = getLearnTopic('treatment')!;
+    const text = treatment.paragraphs.map((p) => p.en).join(' ');
+
+    for (const t of ['Terminate', 'Treat', 'Transfer', 'Tolerate']) {
+      expect(treatment.summary.en, `summary omits ${t}`).toContain(t);
+    }
+    expect(text).toContain('does not use the words');
+    expect(text).toContain('pursue an opportunity');
+    expect(treatment.citations.some((c) => c.url.includes('orange-book'))).toBe(true);
+  });
+
   it('keeps ALE out of the FAIR topic', () => {
     // ALE is not part of FAIR. Filing it there would teach the conflation this
     // content spends its time correcting.
